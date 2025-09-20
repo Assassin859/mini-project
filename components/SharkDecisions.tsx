@@ -55,7 +55,8 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
         } else {
           // All sharks have decided
           setTimeout(() => {
-            onComplete([...decisions, decision]);
+            const allDecisions = [...decisions, decision];
+            onComplete(allDecisions);
           }, 2000);
         }
       }, 3000);
