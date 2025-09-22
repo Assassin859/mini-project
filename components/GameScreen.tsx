@@ -41,33 +41,60 @@ export default function GameScreen({ gameState, onPhaseChange, onUpdateGameState
         );
       
       case GamePhase.SHARK_DECISIONS:
-          return (
-            <SharkDecisions 
-              pitch={gameState.currentPitch!}
-              onComplete={(decisions) => {
-                onUpdateGameState({ sharkDecisions: decisions });
-                onPhaseChange(GamePhase.NEGOTIATION);
-              }}
-            />
-          );
+        return (
+          <SharkDecisions 
+            pitch={gameState.currentPitch!}
+            onComplete={(decisions) => {
+              onUpdateGameState({ sharkDecisions: decisions });
+              onPhaseChange(GamePhase.NEGOTIATION);
+            }}
+          />
+        );
+
+      case GamePhase.NEGOTIATION:
+        return (
+          <Negotiation 
+            pitch={gameState.currentPitch!}
+            decisions={gameState.sharkDecisions!}
+            onComplete={(deal) => {
+              // Update game history and stats
+              const newHistory = [...gameState.gameHistory, deal];
+              const newStats = {
+                totalDeals: gameState.playerStats.totalDeals + 1,
+                successfulDeals: gameState.playerStats.successfulDeals + (deal.accepted ? 1 : 0),
+                totalMoneyRaised: gameState.playerStats.totalMoneyRaised + (deal.accepted ? deal.finalTerms.amount : 0),
+                averageEquity: newHistory.filter(d => d.accepted).length > 0 
+                  ? newHistory.filter(d => d.accepted).reduce((sum, d) => sum + d.finalTerms.equity, 0) / newHistory.filter(d => d.accepted).length 
+                  : gameState.playerStats.averageEquity,
+                entrepreneurScore: Math.min(1000, gameState.playerStats.entrepreneurScore + (deal.accepted ? 10 : -5))
+              };
+>        return (
+          <SharkDecisions 
+            pitch={gameState.currentPitch!}
+            onComplete={(decisions) => {
+              onUpdateGameState({ sharkDecisions: decisions });
+              onPhaseChange(GamePhase.NEGOTIATION);
+            }}
+          />
+        );
       
       case GamePhase.NEGOTIATION:
-          return (
-            <Negotiation 
-              pitch={gameState.currentPitch!}
-              decisions={gameState.sharkDecisions}
-              onComplete={(deal) => {
-                // Update game history and stats
-                const newHistory = [...gameState.gameHistory, deal];
-                const newStats = {
-                  totalDeals: gameState.playerStats.totalDeals + 1,
-                  successfulDeals: gameState.playerStats.successfulDeals + (deal.accepted ? 1 : 0),
-                  totalMoneyRaised: gameState.playerStats.totalMoneyRaised + (deal.accepted ? deal.finalTerms.amount : 0),
-                  averageEquity: newHistory.filter(d => d.accepted).length > 0 
-                    ? newHistory.filter(d => d.accepted).reduce((sum, d) => sum + d.finalTerms.equity, 0) / newHistory.filter(d => d.accepted).length 
-                    : gameState.playerStats.averageEquity,
-                  entrepreneurScore: Math.min(1000, gameState.playerStats.entrepreneurScore + (deal.accepted ? 10 : -5))
-                };
+        return (
+          <Negotiation 
+            pitch={gameState.currentPitch!}
+            decisions={gameState.sharkDecisions!}
+            onComplete={(deal) => {
+              // Update game history and stats
+              const newHistory = [...gameState.gameHistory, deal];
+              const newStats = {
+                totalDeals: gameState.playerStats.totalDeals + 1,
+                successfulDeals: gameState.playerStats.successfulDeals + (deal.accepted ? 1 : 0),
+                totalMoneyRaised: gameState.playerStats.totalMoneyRaised + (deal.accepted ? deal.finalTerms.amount : 0),
+                averageEquity: newHistory.filter(d => d.accepted).length > 0 
+                  ? newHistory.filter(d => d.accepted).reduce((sum, d) => sum + d.finalTerms.equity, 0) / newHistory.filter(d => d.accepted).length 
+                  : gameState.playerStats.averageEquity,
+                entrepreneurScore: Math.min(1000, gameState.playerStats.entrepreneurScore + (deal.accepted ? 10 : -5))
+              };
               
                 onUpdateGameState({
                   gameHistory: newHistory,

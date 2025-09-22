@@ -102,6 +102,7 @@ export interface GameState {
   phase: GamePhase;
   currentPitch: BusinessPitch | null;
   sharks: Shark[];
+  sharkDecisions?: SharkDecision[];
   gameHistory: Deal[];
   playerStats: PlayerStats;
   sharkDecisions: SharkDecision[];

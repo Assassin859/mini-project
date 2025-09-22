@@ -220,7 +220,11 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                 <Input
                   id="playerName"
                   value={playerName}
+<<<<<<< HEAD
                   onChange={(e: any) => updatePlayerName(e.target.value)}
+=======
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updatePlayerName(e.target.value)}
+>>>>>>> ab649c2a91fe09c922a011fd87942c943ec78983
                   placeholder="Your entrepreneur name"
                   className="bg-slate-700 border-slate-600 text-white mt-2"
                 />
@@ -275,7 +279,11 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                     <Input
                       id="roomName"
                       value={roomName}
+<<<<<<< HEAD
                       onChange={(e: any) => setRoomName(e.target.value)}
+=======
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRoomName(e.target.value)}
+>>>>>>> ab649c2a91fe09c922a011fd87942c943ec78983
                       placeholder="Enter room name"
                       className="bg-slate-700 border-slate-600 text-white"
                     />
@@ -288,7 +296,11 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                       min="2"
                       max="6"
                       value={maxPlayers}
+<<<<<<< HEAD
                       onChange={(e: any) => setMaxPlayers(parseInt(e.target.value))}
+=======
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMaxPlayers(parseInt(e.target.value))}
+>>>>>>> ab649c2a91fe09c922a011fd87942c943ec78983
                       className="bg-slate-700 border-slate-600 text-white"
                     />
                   </div>
@@ -324,7 +336,11 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                     <Input
                       id="roomCode"
                       value={roomCode}
+<<<<<<< HEAD
                       onChange={(e: any) => setRoomCode(e.target.value)}
+=======
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRoomCode(e.target.value)}
+>>>>>>> ab649c2a91fe09c922a011fd87942c943ec78983
                       placeholder="Enter room code"
                       className="bg-slate-700 border-slate-600 text-white"
                     />
