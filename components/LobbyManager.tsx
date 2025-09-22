@@ -16,7 +16,7 @@ interface LobbyManagerProps {
 
 export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
   const { gameState, playerName, updatePlayerName, createRoom, joinRoom, playerId, isInitialized } = useMultiplayer();
-  const [availableRooms, setAvailableRooms] = useState<any[]>([]);
+  const [availableRooms, setAvailableRooms] = useState([] as { id: string; name: string; current_players: number; max_players: number }[]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showJoinForm, setShowJoinForm] = useState(false);
   const [roomName, setRoomName] = useState('');
@@ -124,7 +124,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
               <div>
                 <h3 className="text-lg font-semibold text-white mb-4">Players</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {gameState.currentRoom.players.map((player) => (
+                  {gameState.currentRoom.players.map((player: { id: string; name: string; stats: { entrepreneurScore: number }; isHost: boolean; isReady: boolean }) => (
                     <Card key={player.id} className="bg-slate-700/50 border-slate-600">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
@@ -148,10 +148,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                             {player.isReady ? (
                               <Badge className="bg-green-600 text-white">Ready</Badge>
                             ) : (
-                              <Badge variant="outline" className="border-slate-500 text-slate-400">
-                                <Clock className="w-3 h-3 mr-1" />
-                                Waiting
-                              </Badge>
+                              <Badge variant="outline" className="border-slate-500 text-slate-400"><Clock className="w-3 h-3 mr-1" />Waiting</Badge>
                             )}
                           </div>
                         </div>
@@ -166,7 +163,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                 {gameState.currentPlayer?.isHost ? (
                   <Button 
                     onClick={handleStartGame}
-                    disabled={gameState.currentRoom.players.length < 2 || !gameState.currentRoom.players.every(p => p.isReady)}
+                    disabled={gameState.currentRoom.players.length < 2 || !gameState.currentRoom.players.every((p: { isReady: boolean }) => p.isReady)}
                     className="bg-green-600 hover:bg-green-700"
                   >
                     <Play className="w-4 h-4 mr-2" />
@@ -223,7 +220,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                 <Input
                   id="playerName"
                   value={playerName}
-                  onChange={(e) => updatePlayerName(e.target.value)}
+                  onChange={(e: any) => updatePlayerName(e.target.value)}
                   placeholder="Your entrepreneur name"
                   className="bg-slate-700 border-slate-600 text-white mt-2"
                 />
@@ -278,7 +275,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                     <Input
                       id="roomName"
                       value={roomName}
-                      onChange={(e) => setRoomName(e.target.value)}
+                      onChange={(e: any) => setRoomName(e.target.value)}
                       placeholder="Enter room name"
                       className="bg-slate-700 border-slate-600 text-white"
                     />
@@ -291,7 +288,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                       min="2"
                       max="6"
                       value={maxPlayers}
-                      onChange={(e) => setMaxPlayers(parseInt(e.target.value))}
+                      onChange={(e: any) => setMaxPlayers(parseInt(e.target.value))}
                       className="bg-slate-700 border-slate-600 text-white"
                     />
                   </div>
@@ -327,7 +324,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                     <Input
                       id="roomCode"
                       value={roomCode}
-                      onChange={(e) => setRoomCode(e.target.value)}
+                      onChange={(e: any) => setRoomCode(e.target.value)}
                       placeholder="Enter room code"
                       className="bg-slate-700 border-slate-600 text-white"
                     />
@@ -365,7 +362,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {availableRooms.map((room) => (
+                    {availableRooms.map((room: { id: string; name: string; current_players: number; max_players: number }) => (
                       <Card key={room.id} className="bg-slate-700/50 border-slate-600">
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between">
@@ -377,7 +374,6 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                             </div>
                             <Button
                               onClick={() => handleJoinRoom(room.id)}
-                              disabled={room.current_players >= room.max_players || isLoading}
                               disabled={room.current_players >= room.max_players || isLoading || !playerId || !playerName.trim()}
                               className="bg-blue-600 hover:bg-blue-700"
                             >

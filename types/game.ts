@@ -104,6 +104,7 @@ export interface GameState {
   sharks: Shark[];
   gameHistory: Deal[];
   playerStats: PlayerStats;
+  sharkDecisions: SharkDecision[];
 }
 
 export interface GameData {

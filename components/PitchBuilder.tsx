@@ -36,7 +36,7 @@ const BUSINESS_IDEAS = [
 
 export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) {
   const [step, setStep] = useState(1);
-  const [pitch, setPitch] = useState<Partial<BusinessPitch>>({
+  const [pitch, setPitch] = useState({
     businessName: '',
     description: '',
     category: undefined,
@@ -49,7 +49,7 @@ export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) 
     teamExperience: 5
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState({} as Record<string, string>);
 
   const validateStep = (stepNumber: number): boolean => {
     const newErrors: Record<string, string> = {};
@@ -124,7 +124,7 @@ export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) 
 
   const generateRandomIdea = () => {
     const randomIdea = BUSINESS_IDEAS[Math.floor(Math.random() * BUSINESS_IDEAS.length)];
-    setPitch(prev => ({
+  setPitch((prev: any) => ({
       ...prev,
       businessName: randomIdea.name,
       description: randomIdea.description,
@@ -155,7 +155,7 @@ export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) 
                 <Input
                   id="businessName"
                   value={pitch.businessName || ''}
-                  onChange={(e) => setPitch(prev => ({ ...prev, businessName: e.target.value }))}
+                  onChange={(e: any) => setPitch((prev: any) => ({ ...prev, businessName: e.target.value }))}
                   placeholder="Enter your business name"
                   className="bg-slate-800 border-slate-600 text-white"
                 />
@@ -167,7 +167,7 @@ export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) 
                 <Textarea
                   id="description"
                   value={pitch.description || ''}
-                  onChange={(e) => setPitch(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e: any) => setPitch((prev: any) => ({ ...prev, description: e.target.value }))}
                   placeholder="Describe what your business does, the problem it solves, and your unique value proposition"
                   rows={4}
                   className="bg-slate-800 border-slate-600 text-white"
@@ -177,7 +177,7 @@ export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) 
 
               <div>
                 <Label className="text-slate-300">Business Category *</Label>
-                <Select value={pitch.category} onValueChange={(value: BusinessCategory) => setPitch(prev => ({ ...prev, category: value }))}>
+                <Select value={pitch.category} onValueChange={(value: BusinessCategory) => setPitch((prev: any) => ({ ...prev, category: value }))}>
                   <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
@@ -207,7 +207,7 @@ export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) 
                   id="fundingRequest"
                   type="number"
                   value={pitch.fundingRequest || ''}
-                  onChange={(e) => setPitch(prev => ({ ...prev, fundingRequest: parseInt(e.target.value) }))}
+                  onChange={(e: any) => setPitch((prev: any) => ({ ...prev, fundingRequest: parseInt(e.target.value) }))}
                   placeholder="100000"
                   min="10000"
                   max="1000000"
@@ -223,7 +223,7 @@ export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) 
                   id="equityOffered"
                   type="number"
                   value={pitch.equityOffered || ''}
-                  onChange={(e) => setPitch(prev => ({ ...prev, equityOffered: parseInt(e.target.value) }))}
+                  onChange={(e: any) => setPitch((prev: any) => ({ ...prev, equityOffered: parseInt(e.target.value) }))}
                   placeholder="10"
                   min="5"
                   max="50"
@@ -261,7 +261,7 @@ export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) 
                   id="currentRevenue"
                   type="number"
                   value={pitch.currentRevenue || ''}
-                  onChange={(e) => setPitch(prev => ({ ...prev, currentRevenue: parseInt(e.target.value) || 0 }))}
+                  onChange={(e: any) => setPitch((prev: any) => ({ ...prev, currentRevenue: parseInt(e.target.value) || 0 }))}
                   placeholder="0"
                   min="0"
                   className="bg-slate-800 border-slate-600 text-white"
@@ -275,7 +275,7 @@ export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) 
                   id="projectedRevenue"
                   type="number"
                   value={pitch.projectedRevenue || ''}
-                  onChange={(e) => setPitch(prev => ({ ...prev, projectedRevenue: parseInt(e.target.value) }))}
+                  onChange={(e: any) => setPitch((prev: any) => ({ ...prev, projectedRevenue: parseInt(e.target.value) }))}
                   placeholder="500000"
                   min="1"
                   className="bg-slate-800 border-slate-600 text-white"
@@ -314,7 +314,7 @@ export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) 
                   id="marketSize"
                   type="number"
                   value={pitch.marketSize || ''}
-                  onChange={(e) => setPitch(prev => ({ ...prev, marketSize: parseInt(e.target.value) }))}
+                  onChange={(e: any) => setPitch((prev: any) => ({ ...prev, marketSize: parseInt(e.target.value) }))}
                   placeholder="10000000"
                   min="100000"
                   className="bg-slate-800 border-slate-600 text-white"
@@ -327,7 +327,7 @@ export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) 
                 <Textarea
                   id="competition"
                   value={pitch.competition || ''}
-                  onChange={(e) => setPitch(prev => ({ ...prev, competition: e.target.value }))}
+                  onChange={(e: any) => setPitch((prev: any) => ({ ...prev, competition: e.target.value }))}
                   placeholder="Describe your main competitors and how you differentiate from them"
                   rows={3}
                   className="bg-slate-800 border-slate-600 text-white"
@@ -341,7 +341,7 @@ export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) 
                   id="teamExperience"
                   type="number"
                   value={pitch.teamExperience || ''}
-                  onChange={(e) => setPitch(prev => ({ ...prev, teamExperience: parseInt(e.target.value) }))}
+                  onChange={(e: any) => setPitch((prev: any) => ({ ...prev, teamExperience: parseInt(e.target.value) }))}
                   placeholder="5"
                   min="1"
                   max="10"

@@ -6,10 +6,10 @@ import { Dot } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
-const InputOTP = React.forwardRef<
-  React.ElementRef<typeof OTPInput>,
-  React.ComponentPropsWithoutRef<typeof OTPInput>
->(({ className, containerClassName, ...props }, ref) => (
+const InputOTP = React.forwardRef((
+  { className, containerClassName, ...props }: any,
+  ref: any
+) => (
   <OTPInput
     ref={ref}
     containerClassName={cn(
@@ -19,24 +19,23 @@ const InputOTP = React.forwardRef<
     className={cn('disabled:cursor-not-allowed', className)}
     {...props}
   />
-));
+)) as any;
 InputOTP.displayName = 'InputOTP';
 
-const InputOTPGroup = React.forwardRef<
-  React.ElementRef<'div'>,
-  React.ComponentPropsWithoutRef<'div'>
->(({ className, ...props }, ref) => (
+const InputOTPGroup = React.forwardRef((
+  { className, ...props }: any,
+  ref: any
+) => (
   <div ref={ref} className={cn('flex items-center', className)} {...props} />
-));
+)) as any;
 InputOTPGroup.displayName = 'InputOTPGroup';
 
-const InputOTPSlot = React.forwardRef<
-  React.ElementRef<'div'>,
-  React.ComponentPropsWithoutRef<'div'> & { index: number }
->(({ index, className, ...props }, ref) => {
+const InputOTPSlot = React.forwardRef((
+  { index, className, ...props }: any,
+  ref: any
+) => {
   const inputOTPContext = React.useContext(OTPInputContext);
   const { char, hasFakeCaret, isActive } = inputOTPContext.slots[index];
-
   return (
     <div
       ref={ref}
@@ -55,17 +54,17 @@ const InputOTPSlot = React.forwardRef<
       )}
     </div>
   );
-});
+}) as any;
 InputOTPSlot.displayName = 'InputOTPSlot';
 
-const InputOTPSeparator = React.forwardRef<
-  React.ElementRef<'div'>,
-  React.ComponentPropsWithoutRef<'div'>
->(({ ...props }, ref) => (
+const InputOTPSeparator = React.forwardRef((
+  props: any,
+  ref: any
+) => (
   <div ref={ref} role="separator" {...props}>
     <Dot />
   </div>
-));
+)) as any;
 InputOTPSeparator.displayName = 'InputOTPSeparator';
 
 export { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator };

@@ -16,10 +16,10 @@ interface NegotiationProps {
 }
 
 export default function Negotiation({ pitch, decisions, onComplete }: NegotiationProps) {
-  const [selectedOffer, setSelectedOffer] = useState<SharkDecision | null>(null);
-  const [counterOffer, setCounterOffer] = useState<{ amount: number; equity: number } | null>(null);
+  const [selectedOffer, setSelectedOffer] = useState(null as SharkDecision | null);
+  const [counterOffer, setCounterOffer] = useState(null as { amount: number; equity: number } | null);
   const [isCountering, setIsCountering] = useState(false);
-  const [negotiationPhase, setNegotiationPhase] = useState<'selecting' | 'countering' | 'final'>('selecting');
+  const [negotiationPhase, setNegotiationPhase] = useState('selecting' as 'selecting' | 'countering' | 'final');
 
   const activeOffers = decisions.filter(d => !d.isOut && d.offer);
 
@@ -35,7 +35,12 @@ export default function Negotiation({ pitch, decisions, onComplete }: Negotiatio
     const deal: Deal = {
       id: Date.now().toString(),
       pitch,
-      finalOffer: selectedOffer.offer,
+      finalOffer: {
+        sharkId: selectedOffer.sharkId,
+        amount: selectedOffer.offer.amount,
+        equity: selectedOffer.offer.equity,
+        conditions: selectedOffer.offer.conditions,
+      },
       accepted: true,
       finalTerms: {
         amount: selectedOffer.offer.amount,
@@ -95,7 +100,12 @@ export default function Negotiation({ pitch, decisions, onComplete }: Negotiatio
       const deal: Deal = {
         id: Date.now().toString(),
         pitch,
-        finalOffer: selectedOffer.offer,
+        finalOffer: {
+          sharkId: selectedOffer.sharkId,
+          amount: selectedOffer.offer.amount,
+          equity: selectedOffer.offer.equity,
+          conditions: selectedOffer.offer.conditions,
+        },
         accepted: false,
         playerCounterOffer: counterOffer,
         finalTerms: {
@@ -113,11 +123,18 @@ export default function Negotiation({ pitch, decisions, onComplete }: Negotiatio
     const deal: Deal = {
       id: Date.now().toString(),
       pitch,
-      finalOffer: activeOffers[0]?.offer || {
-        sharkId: activeOffers[0]?.sharkId,
-        amount: pitch.fundingRequest,
-        equity: pitch.equityOffered
-      },
+      finalOffer: activeOffers[0]
+        ? {
+            sharkId: activeOffers[0].sharkId,
+            amount: activeOffers[0].offer?.amount ?? pitch.fundingRequest,
+            equity: activeOffers[0].offer?.equity ?? pitch.equityOffered,
+            conditions: activeOffers[0].offer?.conditions,
+          }
+        : {
+            sharkId: undefined as any, // fallback if no active offer
+            amount: pitch.fundingRequest,
+            equity: pitch.equityOffered,
+          },
       accepted: false,
       finalTerms: {
         amount: 0,
@@ -283,9 +300,9 @@ export default function Negotiation({ pitch, decisions, onComplete }: Negotiatio
                         <Input
                           type="number"
                           value={counterOffer?.amount || ''}
-                          onChange={(e) => setCounterOffer(prev => ({ 
-                            ...prev!, 
-                            amount: parseInt(e.target.value) 
+                          onChange={(e: any) => setCounterOffer((prev: any) => ({
+                            ...prev,
+                            amount: Number(e.target.value)
                           }))}
                           className="bg-slate-800 border-slate-600 text-white"
                         />
@@ -295,9 +312,9 @@ export default function Negotiation({ pitch, decisions, onComplete }: Negotiatio
                         <Input
                           type="number"
                           value={counterOffer?.equity || ''}
-                          onChange={(e) => setCounterOffer(prev => ({ 
-                            ...prev!, 
-                            equity: parseInt(e.target.value) 
+                          onChange={(e: any) => setCounterOffer((prev: any) => ({
+                            ...prev,
+                            equity: Number(e.target.value)
                           }))}
                           min="5"
                           max="50"
