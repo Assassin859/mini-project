@@ -44,7 +44,10 @@ export default function GameScreen({ gameState, onPhaseChange, onUpdateGameState
         return (
           <SharkDecisions 
             pitch={gameState.currentPitch!}
-            onComplete={(decisions) => onPhaseChange(GamePhase.NEGOTIATION, decisions)}
+            onComplete={(decisions) => {
+              onUpdateGameState({ sharkDecisions: decisions });
+              onPhaseChange(GamePhase.NEGOTIATION);
+            }}
           />
         );
       
@@ -52,7 +55,7 @@ export default function GameScreen({ gameState, onPhaseChange, onUpdateGameState
         return (
           <Negotiation 
             pitch={gameState.currentPitch!}
-            decisions={gameState.sharks}
+            decisions={gameState.sharkDecisions!}
             onComplete={(deal) => {
               // Update game history and stats
               const newHistory = [...gameState.gameHistory, deal];
