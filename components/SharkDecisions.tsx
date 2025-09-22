@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BusinessPitch, SharkDecision } from '@/types/game';
 import { SHARKS } from '@/lib/sharks';
-import { calculateSharkDecision } from '@/lib/ai-logic';
+import { supabase } from '@/lib/supabase';
 
 interface SharkDecisionsProps {
   pitch: BusinessPitch;
@@ -14,32 +14,41 @@ interface SharkDecisionsProps {
 
 export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProps) {
   const [currentShark, setCurrentShark] = useState(0);
-  const [decisions, setDecisions] = useState<SharkDecision[]>([]);
+  const [decisions, setDecisions] = useState([] as SharkDecision[]);
   const [isRevealing, setIsRevealing] = useState(false);
   const [showDecision, setShowDecision] = useState(false);
 
   useEffect(() => {
-    // Start the first shark decision after a brief delay
-    const timer = setTimeout(() => {
-      revealSharkDecision();
+    const timer = setTimeout(async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('shark-decision-maker', {
+          body: { sharks: SHARKS, pitch }
+        });
+        if (error) throw error;
+        if (data?.decisions) {
+          // Preload all decisions; reveal sequentially
+          setDecisions(data.decisions as SharkDecision[]);
+          revealSharkDecision();
+        }
+      } catch (e) {
+        console.error('Failed to get shark decisions:', e);
+      }
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [pitch]);
 
   const revealSharkDecision = () => {
     if (currentShark >= SHARKS.length) return;
 
     setIsRevealing(true);
     
-    // Calculate the shark's decision
     const shark = SHARKS[currentShark];
-    const decision = calculateSharkDecision(shark, pitch);
-    
+    const decision = decisions[currentShark];
+
     // Show thinking animation
     setTimeout(() => {
       setShowDecision(true);
-      setDecisions(prev => [...prev, decision]);
       
       // Move to next shark or complete
       setTimeout(() => {
@@ -55,8 +64,7 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
         } else {
           // All sharks have decided
           setTimeout(() => {
-            const allDecisions = [...decisions, decision];
-            onComplete(allDecisions);
+            onComplete(decisions);
           }, 2000);
         }
       }, 3000);
@@ -187,7 +195,7 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
           <div className="mt-8">
             <h3 className="text-xl font-bold text-white mb-4">Previous Decisions</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {decisions.slice(0, currentShark).map((decision, index) => {
+              {decisions.slice(0, currentShark).map((decision: SharkDecision, index: number) => {
                 const sharkInfo = SHARKS[index];
                 return (
                   <Card key={index} className={`bg-slate-800/30 border-slate-600 ${decision.isOut ? 'opacity-50' : ''}`}>
