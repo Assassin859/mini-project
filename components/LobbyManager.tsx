@@ -223,7 +223,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                 <Input
                   id="playerName"
                   value={playerName}
-                  onChange={(e) => updatePlayerName(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => updatePlayerName(e.target.value)}
                   placeholder="Your entrepreneur name"
                   className="bg-slate-700 border-slate-600 text-white mt-2"
                 />
@@ -278,7 +278,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                     <Input
                       id="roomName"
                       value={roomName}
-                      onChange={(e) => setRoomName(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRoomName(e.target.value)}
                       placeholder="Enter room name"
                       className="bg-slate-700 border-slate-600 text-white"
                     />
@@ -291,7 +291,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                       min="2"
                       max="6"
                       value={maxPlayers}
-                      onChange={(e) => setMaxPlayers(parseInt(e.target.value))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMaxPlayers(parseInt(e.target.value))}
                       className="bg-slate-700 border-slate-600 text-white"
                     />
                   </div>
@@ -327,7 +327,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                     <Input
                       id="roomCode"
                       value={roomCode}
-                      onChange={(e) => setRoomCode(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRoomCode(e.target.value)}
                       placeholder="Enter room code"
                       className="bg-slate-700 border-slate-600 text-white"
                     />
