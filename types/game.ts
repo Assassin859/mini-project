@@ -102,10 +102,9 @@ export interface GameState {
   phase: GamePhase;
   currentPitch: BusinessPitch | null;
   sharks: Shark[];
-  sharkDecisions?: SharkDecision[];
+  sharkDecisions: SharkDecision[] | null;
   gameHistory: Deal[];
   playerStats: PlayerStats;
-  sharkDecisions: SharkDecision[];
 }
 
 export interface GameData {
