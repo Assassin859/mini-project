@@ -14,24 +14,26 @@ export function useMultiplayer() {
     error: null,
   } as MultiplayerGameState);
 
-  const [playerId] = useState(() => {
+  const [playerId, setPlayerId] = useState<string | null>(null);
+  const [playerName, setPlayerName] = useState('');
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Initialize player data on client side only
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       let id = localStorage.getItem('shark-tank-player-id');
       if (!id) {
         id = `player_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         localStorage.setItem('shark-tank-player-id', id);
       }
-      return id;
+      setPlayerId(id);
+      
+      const name = localStorage.getItem('shark-tank-player-name') || '';
+      setPlayerName(name);
+      
+      setIsInitialized(true);
     }
-    return `player_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  });
-
-  const [playerName, setPlayerName] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('shark-tank-player-name') || '';
-    }
-    return '';
-  });
+  }, []);
 
   // Subscribe to room updates
   const subscribeToRoom = useCallback((roomId: string) => {
@@ -107,6 +109,11 @@ export function useMultiplayer() {
   }, []);
 
   const createRoom = useCallback(async (roomName: string, maxPlayers: number = 4) => {
+    if (!playerId || !playerName.trim()) {
+      setGameState((prev: MultiplayerGameState) => ({ ...prev, error: 'Player ID or name is required' }));
+      return null;
+    }
+
     if (!playerName.trim()) {
       setGameState((prev: MultiplayerGameState) => ({ ...prev, error: 'Player name is required' }));
       return null;
@@ -195,6 +202,11 @@ export function useMultiplayer() {
   }, [playerId, playerName, subscribeToRoom]);
 
   const joinRoom = useCallback(async (roomId: string) => {
+    if (!playerId || !playerName.trim()) {
+      setGameState((prev: MultiplayerGameState) => ({ ...prev, error: 'Player ID or name is required' }));
+      return false;
+    }
+
     if (!playerName.trim()) {
       setGameState((prev: MultiplayerGameState) => ({ ...prev, error: 'Player name is required' }));
       return false;
@@ -314,7 +326,7 @@ export function useMultiplayer() {
   }, [playerId, playerName, subscribeToRoom]);
 
   const leaveRoom = useCallback(async () => {
-    if (!gameState.currentRoom) return;
+    if (!gameState.currentRoom || !playerId) return;
 
     try {
       // Inform backend about disconnect to handle turn/active flags
@@ -353,7 +365,7 @@ export function useMultiplayer() {
   }, [gameState.currentRoom, playerId]);
 
   const sendGameAction = useCallback(async (action: Omit<GameAction, 'playerId'>) => {
-    if (!gameState.currentRoom) return;
+    if (!gameState.currentRoom || !playerId) return;
 
     const fullAction: GameAction = {
       ...action,
@@ -398,6 +410,7 @@ export function useMultiplayer() {
     gameState,
     playerId,
     playerName,
+    isInitialized,
     updatePlayerName,
     createRoom,
     joinRoom,

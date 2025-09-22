@@ -15,7 +15,7 @@ interface LobbyManagerProps {
 }
 
 export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
-  const { gameState, playerName, updatePlayerName, createRoom, joinRoom } = useMultiplayer();
+  const { gameState, playerName, updatePlayerName, createRoom, joinRoom, playerId, isInitialized } = useMultiplayer();
   const [availableRooms, setAvailableRooms] = useState<any[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showJoinForm, setShowJoinForm] = useState(false);
@@ -25,8 +25,10 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    loadAvailableRooms();
-  }, []);
+    if (isInitialized) {
+      loadAvailableRooms();
+    }
+  }, [isInitialized]);
 
   const loadAvailableRooms = async () => {
     try {
@@ -45,7 +47,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
   };
 
   const handleCreateRoom = async () => {
-    if (!roomName.trim() || !playerName.trim()) return;
+    if (!roomName.trim() || !playerName.trim() || !playerId) return;
     
     setIsLoading(true);
     const roomId = await createRoom(roomName, maxPlayers);
@@ -58,7 +60,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
   };
 
   const handleJoinRoom = async (roomId: string) => {
-    if (!playerName.trim()) return;
+    if (!playerName.trim() || !playerId) return;
     
     setIsLoading(true);
     const success = await joinRoom(roomId);
@@ -71,7 +73,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
   };
 
   const handleJoinByCode = async () => {
-    if (!roomCode.trim()) return;
+    if (!roomCode.trim() || !playerId) return;
     await handleJoinRoom(roomCode);
   };
 
@@ -83,6 +85,15 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
     // Implementation for starting the game
     onGameStart();
   };
+
+  // Show loading state while initializing
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-white text-xl">Initializing...</div>
+      </div>
+    );
+  }
 
   // If player is in a room, show lobby
   if (gameState.currentRoom) {
@@ -228,7 +239,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
               <Button
                 onClick={() => setShowCreateForm(true)}
                 className="bg-blue-600 hover:bg-blue-700 h-20 text-lg"
-                disabled={isLoading}
+                disabled={isLoading || !playerId || !playerName.trim()}
               >
                 <Plus className="w-6 h-6 mr-2" />
                 Create Room
@@ -238,7 +249,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                 onClick={() => setShowJoinForm(true)}
                 variant="outline"
                 className="border-slate-600 text-slate-300 hover:bg-slate-700 h-20 text-lg"
-                disabled={isLoading}
+                disabled={isLoading || !playerId || !playerName.trim()}
               >
                 <Users className="w-6 h-6 mr-2" />
                 Join by Code
@@ -248,7 +259,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                 onClick={loadAvailableRooms}
                 variant="outline"
                 className="border-slate-600 text-slate-300 hover:bg-slate-700 h-20 text-lg"
-                disabled={isLoading}
+                disabled={isLoading || !playerId}
               >
                 <RefreshCw className="w-6 h-6 mr-2" />
                 Refresh Rooms
@@ -287,7 +298,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                   <div className="flex space-x-4">
                     <Button 
                       onClick={handleCreateRoom}
-                      disabled={!roomName.trim() || isLoading}
+                      disabled={!roomName.trim() || isLoading || !playerId || !playerName.trim()}
                       className="bg-green-600 hover:bg-green-700"
                     >
                       Create Room
@@ -324,7 +335,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                   <div className="flex space-x-4">
                     <Button 
                       onClick={handleJoinByCode}
-                      disabled={!roomCode.trim() || isLoading}
+                      disabled={!roomCode.trim() || isLoading || !playerId || !playerName.trim()}
                       className="bg-blue-600 hover:bg-blue-700"
                     >
                       Join Room
@@ -367,6 +378,7 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                             <Button
                               onClick={() => handleJoinRoom(room.id)}
                               disabled={room.current_players >= room.max_players || isLoading}
+                              disabled={room.current_players >= room.max_players || isLoading || !playerId || !playerName.trim()}
                               className="bg-blue-600 hover:bg-blue-700"
                             >
                               Join
