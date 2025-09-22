@@ -1,18 +1,18 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { RoomState, Player, GameAction, MultiplayerGameState } from '@/types/multiplayer';
 import { GamePhase } from '@/types/game';
 
 export function useMultiplayer() {
-  const [gameState, setGameState] = useState<MultiplayerGameState>({
+  const [gameState, setGameState] = useState({
     currentRoom: null,
     currentPlayer: null,
     isConnected: false,
     isLoading: false,
     error: null,
-  });
+  } as MultiplayerGameState);
 
   const [playerId] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -42,15 +42,15 @@ export function useMultiplayer() {
         schema: 'public',
         table: 'rooms',
         filter: `id=eq.${roomId}`,
-      }, (payload) => {
+      }, (payload: { new?: unknown; payload?: unknown }) => {
         if (payload.new) {
-          setGameState(prev => ({
+          setGameState((prev: MultiplayerGameState) => ({
             ...prev,
             currentRoom: payload.new as RoomState,
           }));
         }
       })
-      .on('broadcast', { event: 'game_action' }, (payload) => {
+      .on('broadcast', { event: 'game_action' }, (payload: { payload: GameAction }) => {
         handleGameAction(payload.payload as GameAction);
       })
       .subscribe();
@@ -64,7 +64,7 @@ export function useMultiplayer() {
     // Handle real-time game actions
     console.log('Received game action:', action);
     
-    setGameState(prev => {
+    setGameState((prev: MultiplayerGameState) => {
       if (!prev.currentRoom) return prev;
       
       const updatedRoom = { ...prev.currentRoom };
@@ -108,11 +108,11 @@ export function useMultiplayer() {
 
   const createRoom = useCallback(async (roomName: string, maxPlayers: number = 4) => {
     if (!playerName.trim()) {
-      setGameState(prev => ({ ...prev, error: 'Player name is required' }));
+      setGameState((prev: MultiplayerGameState) => ({ ...prev, error: 'Player name is required' }));
       return null;
     }
 
-    setGameState(prev => ({ ...prev, isLoading: true, error: null }));
+    setGameState((prev: MultiplayerGameState) => ({ ...prev, isLoading: true, error: null }));
 
     try {
       // Create room
@@ -173,7 +173,7 @@ export function useMultiplayer() {
         updatedAt: room.updated_at,
       };
 
-      setGameState(prev => ({
+      setGameState((prev: MultiplayerGameState) => ({
         ...prev,
         currentRoom: roomState,
         currentPlayer: roomState.players[0],
@@ -185,7 +185,7 @@ export function useMultiplayer() {
       return room.id;
     } catch (error) {
       console.error('Error creating room:', error);
-      setGameState(prev => ({
+      setGameState((prev: MultiplayerGameState) => ({
         ...prev,
         error: 'Failed to create room',
         isLoading: false,
@@ -196,11 +196,11 @@ export function useMultiplayer() {
 
   const joinRoom = useCallback(async (roomId: string) => {
     if (!playerName.trim()) {
-      setGameState(prev => ({ ...prev, error: 'Player name is required' }));
+      setGameState((prev: MultiplayerGameState) => ({ ...prev, error: 'Player name is required' }));
       return false;
     }
 
-    setGameState(prev => ({ ...prev, isLoading: true, error: null }));
+    setGameState((prev: MultiplayerGameState) => ({ ...prev, isLoading: true, error: null }));
 
     try {
       // Get room info
@@ -292,7 +292,7 @@ export function useMultiplayer() {
 
       const currentPlayer = roomState.players.find(p => p.id === playerId)!;
 
-      setGameState(prev => ({
+      setGameState((prev: MultiplayerGameState) => ({
         ...prev,
         currentRoom: roomState,
         currentPlayer,
@@ -304,7 +304,7 @@ export function useMultiplayer() {
       return true;
     } catch (error) {
       console.error('Error joining room:', error);
-      setGameState(prev => ({
+      setGameState((prev: MultiplayerGameState) => ({
         ...prev,
         error: error instanceof Error ? error.message : 'Failed to join room',
         isLoading: false,
@@ -317,6 +317,15 @@ export function useMultiplayer() {
     if (!gameState.currentRoom) return;
 
     try {
+      // Inform backend about disconnect to handle turn/active flags
+      try {
+        await supabase.functions.invoke('player-disconnect', {
+          body: { roomId: gameState.currentRoom.id, playerId },
+        });
+      } catch (e) {
+        console.error('player-disconnect edge failed', e);
+      }
+
       // Remove player from room
       await supabase
         .from('room_players')
@@ -332,7 +341,7 @@ export function useMultiplayer() {
         })
         .eq('id', gameState.currentRoom.id);
 
-      setGameState(prev => ({
+      setGameState((prev: MultiplayerGameState) => ({
         ...prev,
         currentRoom: null,
         currentPlayer: null,
@@ -371,7 +380,7 @@ export function useMultiplayer() {
       });
     } catch (error) {
       console.error('Error sending game action:', error);
-      setGameState(prev => ({
+      setGameState((prev: MultiplayerGameState) => ({
         ...prev,
         error: 'Failed to send action',
       }));
