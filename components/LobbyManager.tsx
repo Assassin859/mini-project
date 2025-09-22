@@ -377,7 +377,6 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                             </div>
                             <Button
                               onClick={() => handleJoinRoom(room.id)}
-                              disabled={room.current_players >= room.max_players || isLoading}
                               disabled={room.current_players >= room.max_players || isLoading || !playerId || !playerName.trim()}
                               className="bg-blue-600 hover:bg-blue-700"
                             >
