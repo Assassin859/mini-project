@@ -12,8 +12,8 @@ Deno.serve(async (req: Request) => {
 
   try {
     const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? 'https://hgjcwjybhfhhlukglliq.supabase.co',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhnamN3anliaGZoaGx1a2dsbGlxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODM2ODQ2NSwiZXhwIjoyMDczOTQ0NDY1fQ.vPiMGn_OoAK7j8FWJElx3gNCj_gPYMik89qqHFQaDUc',
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     )
 
     const { roomId, action } = await req.json()
