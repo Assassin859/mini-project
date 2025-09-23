@@ -11,12 +11,12 @@ export function useMultiplayer() {
     currentPlayer: null,
     isConnected: false,
     isLoading: false,
-    error: null,
+    error: 'Multiplayer has been removed',
   } as MultiplayerGameState);
 
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [playerName, setPlayerName] = useState('');
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(true);
 
   // Initialize player data on client side only
   useEffect(() => {
@@ -58,39 +58,13 @@ export function useMultiplayer() {
   }, []);
 
   // Subscribe to room updates
-  const subscribeToRoom = useCallback((roomId: string) => {
-    const channel = supabase
-      .channel(`room:${roomId}`)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'rooms',
-        filter: `id=eq.${roomId}`,
-      }, (payload: any) => {
-        const row = payload?.new;
-        if (!row) return;
-        const mapped = mapRoomRowToState(row);
-        setGameState((prev: MultiplayerGameState) => ({
-          ...prev,
-          currentRoom: mapped,
-          currentPlayer: prev.currentPlayer
-            ? mapped.players.find(p => p.id === prev.currentPlayer!.id) || prev.currentPlayer
-            : prev.currentPlayer,
-        }));
-      })
-      .on('broadcast', { event: 'game_action' }, (payload: { payload: GameAction }) => {
-        handleGameAction(payload.payload as GameAction);
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+  const subscribeToRoom = useCallback((_roomId: string) => {
+    return () => {};
   }, []);
 
-  const handleGameAction = useCallback((action: GameAction) => {
+  const handleGameAction = useCallback((_action: GameAction) => {
     // Handle real-time game actions
-    console.log('Received game action:', action);
+    return;
     
     setGameState((prev: MultiplayerGameState) => {
       if (!prev.currentRoom) return prev;
@@ -157,40 +131,9 @@ export function useMultiplayer() {
     }));
   }, []);
 
-  const sendGameAction = useCallback(async (action: Omit<GameAction, 'playerId'>) => {
-    if (!gameState.currentRoom || !playerId) return;
-
-    const fullAction: GameAction = {
-      ...action,
-      playerId,
-    };
-
-    try {
-      // Send action via Edge Function
-      const { error } = await supabase.functions.invoke('game-action', {
-        body: {
-          roomId: gameState.currentRoom.id,
-          action: fullAction,
-        },
-      });
-
-      if (error) throw error;
-
-      // Also broadcast to other players
-      const channel = supabase.channel(`room:${gameState.currentRoom.id}`);
-      await channel.send({
-        type: 'broadcast',
-        event: 'game_action',
-        payload: fullAction,
-      });
-    } catch (error) {
-      console.error('Error sending game action:', error);
-      setGameState((prev: MultiplayerGameState) => ({
-        ...prev,
-        error: 'Failed to send action',
-      }));
-    }
-  }, [gameState.currentRoom, playerId]);
+  const sendGameAction = useCallback(async (_action: Omit<GameAction, 'playerId'>) => {
+    setGameState((prev: MultiplayerGameState) => ({ ...prev, error: 'Multiplayer has been removed' }));
+  }, []);
 
   const updatePlayerName = useCallback((name: string) => {
     setPlayerName(name);
