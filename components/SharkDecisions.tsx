@@ -20,27 +20,20 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
 
   // Generate all shark decisions initially
   useEffect(() => {
-    const timer = setTimeout(async () => {
+    const timer = setTimeout(() => {
       try {
-        // Generate AI decisions for each shark
-        const generatedDecisions = SHARKS.map(shark => calculateSharkDecision(shark, pitch));
-        setAllDecisions(generatedDecisions);
+        const generated = SHARKS.map(shark => calculateSharkDecision(shark, pitch));
+        setAllDecisions(generated);
       } catch (e) {
-        console.error('Failed to get shark decisions:', e);
-        // Fallback: generate basic decisions
-        const fallbackDecisions = SHARKS.map(shark => ({
+        console.error('Failed to generate decisions', e);
+        const fallback = SHARKS.map(shark => ({
           sharkId: shark.id,
-          isOut: Math.random() > 0.6,
-          reasoning: "I need to think about this opportunity.",
-          offer: Math.random() > 0.5 ? {
-            amount: pitch.fundingRequest,
-            equity: Math.min(50, pitch.equityOffered * 1.5)
-          } : undefined
-        }));
-        setAllDecisions(fallbackDecisions);
+          isOut: true,
+          reasoning: "I'm out.",
+        })) as SharkDecision[];
+        setAllDecisions(fallback);
       }
-    }, 2000);
-
+    }, 500);
     return () => clearTimeout(timer);
   }, [pitch]);
 
@@ -68,6 +61,7 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
         if (currentSharkIndex < SHARKS.length - 1) {
           setCurrentSharkIndex(currentSharkIndex + 1);
           setIsRevealing(false);
+          setShowDecisionContent(false);
         }
       }, 3000);
       
