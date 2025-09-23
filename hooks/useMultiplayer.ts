@@ -35,6 +35,28 @@ export function useMultiplayer() {
     }
   }, []);
 
+  // Helper to map Supabase row -> RoomState shape used by UI
+  const mapRoomRowToState = useCallback((row: any): RoomState => {
+    const gameState = (row?.game_state ?? {}) as any;
+    const players = Array.isArray(gameState.players) ? gameState.players : [];
+    return {
+      id: row.id,
+      name: row.name,
+      hostId: row.host_id,
+      maxPlayers: row.max_players,
+      players,
+      status: row.status,
+      gamePhase: gameState.gamePhase ?? gameState.phase ?? GamePhase.MENU,
+      currentPlayerTurn: gameState.currentPlayerTurn,
+      currentPitch: gameState.currentPitch,
+      sharkDecisions: Array.isArray(gameState.sharkDecisions) ? gameState.sharkDecisions : undefined,
+      deals: Array.isArray(gameState.deals) ? gameState.deals : [],
+      roundNumber: typeof gameState.roundNumber === 'number' ? gameState.roundNumber : 1,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    } as RoomState;
+  }, []);
+
   // Subscribe to room updates
   const subscribeToRoom = useCallback((roomId: string) => {
     const channel = supabase
@@ -44,13 +66,17 @@ export function useMultiplayer() {
         schema: 'public',
         table: 'rooms',
         filter: `id=eq.${roomId}`,
-      }, (payload: { new?: unknown; payload?: unknown }) => {
-        if (payload.new) {
-          setGameState((prev: MultiplayerGameState) => ({
-            ...prev,
-            currentRoom: payload.new as RoomState,
-          }));
-        }
+      }, (payload: any) => {
+        const row = payload?.new;
+        if (!row) return;
+        const mapped = mapRoomRowToState(row);
+        setGameState((prev: MultiplayerGameState) => ({
+          ...prev,
+          currentRoom: mapped,
+          currentPlayer: prev.currentPlayer
+            ? mapped.players.find(p => p.id === prev.currentPlayer!.id) || prev.currentPlayer
+            : prev.currentPlayer,
+        }));
       })
       .on('broadcast', { event: 'game_action' }, (payload: { payload: GameAction }) => {
         handleGameAction(payload.payload as GameAction);
@@ -69,7 +95,11 @@ export function useMultiplayer() {
     setGameState((prev: MultiplayerGameState) => {
       if (!prev.currentRoom) return prev;
       
-      const updatedRoom = { ...prev.currentRoom };
+      const updatedRoom: RoomState = {
+        ...prev.currentRoom,
+        players: Array.isArray(prev.currentRoom.players) ? [...prev.currentRoom.players] : [],
+        deals: Array.isArray(prev.currentRoom.deals) ? [...prev.currentRoom.deals] : [],
+      };
       
       switch (action.type) {
         case 'READY_UP':
@@ -91,13 +121,13 @@ export function useMultiplayer() {
           updatedRoom.gamePhase = GamePhase.NEGOTIATION;
           break;
         case 'NEGOTIATE':
-          updatedRoom.deals = [...updatedRoom.deals, action.payload];
+          updatedRoom.deals = [...(updatedRoom.deals || []), action.payload];
           updatedRoom.gamePhase = GamePhase.RESULTS;
           break;
         case 'NEXT_TURN':
           updatedRoom.currentPlayerTurn = action.payload.nextPlayerId;
           updatedRoom.gamePhase = GamePhase.PITCH_BUILDER;
-          updatedRoom.roundNumber += 1;
+          updatedRoom.roundNumber = (updatedRoom.roundNumber || 1) + 1;
           break;
       }
       
