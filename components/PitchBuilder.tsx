@@ -13,6 +13,7 @@ import { ChevronLeft, ChevronRight, Lightbulb } from 'lucide-react';
 interface PitchBuilderProps {
   onComplete: (pitch: BusinessPitch) => void;
   onBack: () => void;
+  entrepreneurScore?: number;
 }
 
 const BUSINESS_CATEGORIES = [
@@ -34,7 +35,7 @@ const BUSINESS_IDEAS = [
   { name: "GreenStream", category: BusinessCategory.MANUFACTURING, description: "Solar-powered water purification systems" }
 ];
 
-export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) {
+export default function PitchBuilder({ onComplete, onBack, entrepreneurScore = 100 }: PitchBuilderProps) {
   const [step, setStep] = useState(1);
   const [pitch, setPitch] = useState({
     businessName: '',
@@ -51,6 +52,12 @@ export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) 
 
   const [errors, setErrors] = useState({} as Record<string, string>);
 
+  // Calculate funding limits based on entrepreneur score
+  const getMinFunding = () => Math.max(10000, entrepreneurScore * 100);
+  const getMaxFunding = () => Math.min(1000000, entrepreneurScore * 10000);
+  const getMinEquity = () => Math.max(5, Math.floor(20 - (entrepreneurScore - 100) / 50));
+  const getMaxEquity = () => 50;
+
   const validateStep = (stepNumber: number): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -61,11 +68,18 @@ export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) 
         if (!pitch.category) newErrors.category = 'Business category is required';
         break;
       case 2:
-        if (!pitch.fundingRequest || pitch.fundingRequest < 10000) {
-          newErrors.fundingRequest = 'Funding request must be at least $10,000';
+        const minFunding = getMinFunding();
+        const maxFunding = getMaxFunding();
+        if (!pitch.fundingRequest || pitch.fundingRequest < minFunding) {
+          newErrors.fundingRequest = `Funding request must be at least $${minFunding.toLocaleString()}`;
         }
-        if (!pitch.equityOffered || pitch.equityOffered < 5 || pitch.equityOffered > 50) {
-          newErrors.equityOffered = 'Equity must be between 5% and 50%';
+        if (pitch.fundingRequest > maxFunding) {
+          newErrors.fundingRequest = `Funding request cannot exceed $${maxFunding.toLocaleString()} at your current level`;
+        }
+        const minEquity = getMinEquity();
+        const maxEquity = getMaxEquity();
+        if (!pitch.equityOffered || pitch.equityOffered < minEquity || pitch.equityOffered > maxEquity) {
+          newErrors.equityOffered = `Equity must be between ${minEquity}% and ${maxEquity}%`;
         }
         break;
       case 3:
@@ -209,12 +223,14 @@ export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) 
                   value={pitch.fundingRequest || ''}
                   onChange={(e: any) => setPitch((prev: any) => ({ ...prev, fundingRequest: parseInt(e.target.value) }))}
                   placeholder="100000"
-                  min="10000"
-                  max="1000000"
+                  min={getMinFunding()}
+                  max={getMaxFunding()}
                   className="bg-slate-800 border-slate-600 text-white"
                 />
                 {errors.fundingRequest && <p className="text-red-400 text-sm mt-1">{errors.fundingRequest}</p>}
-                <p className="text-slate-400 text-sm mt-1">Range: $10,000 - $1,000,000</p>
+                <p className="text-slate-400 text-sm mt-1">
+                  Range: ${getMinFunding().toLocaleString()} - ${getMaxFunding().toLocaleString()}
+                </p>
               </div>
 
               <div>
@@ -225,12 +241,14 @@ export default function PitchBuilder({ onComplete, onBack }: PitchBuilderProps) 
                   value={pitch.equityOffered || ''}
                   onChange={(e: any) => setPitch((prev: any) => ({ ...prev, equityOffered: parseInt(e.target.value) }))}
                   placeholder="10"
-                  min="5"
-                  max="50"
+                  min={getMinEquity()}
+                  max={getMaxEquity()}
                   className="bg-slate-800 border-slate-600 text-white"
                 />
                 {errors.equityOffered && <p className="text-red-400 text-sm mt-1">{errors.equityOffered}</p>}
-                <p className="text-slate-400 text-sm mt-1">Range: 5% - 50%</p>
+                <p className="text-slate-400 text-sm mt-1">
+                  Range: {getMinEquity()}% - {getMaxEquity()}%
+                </p>
               </div>
             </div>
 

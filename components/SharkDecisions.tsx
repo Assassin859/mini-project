@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BusinessPitch, SharkDecision } from '@/types/game';
 import { SHARKS } from '@/lib/sharks';
-import { supabase } from '@/lib/supabase';
+import { calculateSharkDecision } from '@/lib/ai-logic';
 
 interface SharkDecisionsProps {
   pitch: BusinessPitch;
@@ -21,17 +21,24 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
   useEffect(() => {
     const timer = setTimeout(async () => {
       try {
-        const { data, error } = await supabase.functions.invoke('shark-decision-maker', {
-          body: { sharks: SHARKS, pitch }
-        });
-        if (error) throw error;
-        if (data?.decisions) {
-          // Preload all decisions; reveal sequentially
-          setDecisions(data.decisions as SharkDecision[]);
-          revealSharkDecision();
-        }
+        // Generate AI decisions for each shark
+        const generatedDecisions = SHARKS.map(shark => calculateSharkDecision(shark, pitch));
+        setDecisions(generatedDecisions);
+        revealSharkDecision();
       } catch (e) {
         console.error('Failed to get shark decisions:', e);
+        // Fallback: generate basic decisions
+        const fallbackDecisions = SHARKS.map(shark => ({
+          sharkId: shark.id,
+          isOut: Math.random() > 0.6,
+          reasoning: "I need to think about this opportunity.",
+          offer: Math.random() > 0.5 ? {
+            amount: pitch.fundingRequest,
+            equity: Math.min(50, pitch.equityOffered * 1.5)
+          } : undefined
+        }));
+        setDecisions(fallbackDecisions);
+        revealSharkDecision();
       }
     }, 2000);
 
@@ -155,11 +162,15 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
                 <div className={`text-center transition-all duration-1000 ${showDecision ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
                   {currentDecision?.isOut ? (
                     <div>
+                      {/* TODO: Add sound effect for shark going out */}
+                      {/* useEffect(() => { const outSound = new Audio('/sounds/shark-out.mp3'); outSound.play(); }, []); */}
                       <div className="text-6xl mb-4">❌</div>
                       <h3 className="text-2xl font-bold text-red-400 mb-4">I'm Out!</h3>
                     </div>
                   ) : (
                     <div>
+                      {/* TODO: Add sound effect for shark making offer */}
+                      {/* useEffect(() => { const offerSound = new Audio('/sounds/shark-offer.mp3'); offerSound.play(); }, []); */}
                       <div className="text-6xl mb-4">💰</div>
                       <h3 className="text-2xl font-bold text-green-400 mb-4">I'll Make an Offer!</h3>
                       {currentDecision?.offer && (

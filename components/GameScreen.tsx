@@ -29,6 +29,7 @@ export default function GameScreen({ gameState, onPhaseChange, onUpdateGameState
           <PitchBuilder 
             onComplete={(pitch) => onPhaseChange(GamePhase.PRESENTATION, pitch)}
             onBack={handleBackToMenu}
+            entrepreneurScore={gameState.playerStats.entrepreneurScore}
           />
         );
       

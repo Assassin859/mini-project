@@ -31,6 +31,10 @@ export default function Negotiation({ pitch, decisions, onComplete }: Negotiatio
   const handleAcceptOffer = () => {
     if (!selectedOffer || !selectedOffer.offer) return;
 
+    // TODO: Add sound effect for deal acceptance
+    // const acceptSound = new Audio('/sounds/deal-accepted.mp3');
+    // acceptSound.play().catch(console.error);
+
     const shark = SHARKS.find(s => s.id === selectedOffer.sharkId)!;
     const deal: Deal = {
       id: Date.now().toString(),
@@ -65,6 +69,10 @@ export default function Negotiation({ pitch, decisions, onComplete }: Negotiatio
 
   const handleSubmitCounter = () => {
     if (!selectedOffer || !selectedOffer.offer || !counterOffer) return;
+
+    // TODO: Add sound effect for counter offer
+    // const counterSound = new Audio('/sounds/counter-offer.mp3');
+    // counterSound.play().catch(console.error);
 
     // AI decides whether to accept the counter offer
     const shark = SHARKS.find(s => s.id === selectedOffer.sharkId)!;
@@ -120,6 +128,10 @@ export default function Negotiation({ pitch, decisions, onComplete }: Negotiatio
   };
 
   const handleWalkAway = () => {
+    // TODO: Add sound effect for walking away
+    // const walkAwaySound = new Audio('/sounds/walk-away.mp3');
+    // walkAwaySound.play().catch(console.error);
+
     const deal: Deal = {
       id: Date.now().toString(),
       pitch,

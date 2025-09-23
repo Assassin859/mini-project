@@ -76,6 +76,7 @@ export default function MainMenu({ gameState, onStartGame, onViewHistory, onView
         {/* Menu Options */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card className="bg-gradient-to-br from-blue-600 to-blue-800 border-blue-400 hover:scale-105 transition-transform cursor-pointer">
+          <Card className="bg-gradient-to-br from-corporate-blue-600 to-corporate-blue-800 border-corporate-blue-400 hover:scale-105 transition-transform cursor-pointer">
             <CardHeader>
               <div className="flex items-center space-x-3">
                 <PlayCircle className="w-8 h-8 text-white" />
@@ -89,7 +90,7 @@ export default function MainMenu({ gameState, onStartGame, onViewHistory, onView
               </p>
               <Button 
                 onClick={onStartGame}
-                className="w-full bg-white text-blue-600 hover:bg-blue-50 font-semibold"
+                className="w-full bg-white text-corporate-blue-600 hover:bg-corporate-blue-50 font-semibold"
                 size="lg"
               >
                 Enter the Tank
@@ -97,7 +98,7 @@ export default function MainMenu({ gameState, onStartGame, onViewHistory, onView
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-600 to-purple-800 border-purple-400 hover:scale-105 transition-transform cursor-pointer">
+          <Card className="bg-gradient-to-br from-corporate-gold-600 to-corporate-gold-800 border-corporate-gold-400 hover:scale-105 transition-transform cursor-pointer">
             <CardHeader>
               <div className="flex items-center space-x-3">
                 <Users className="w-8 h-8 text-white" />
@@ -105,13 +106,13 @@ export default function MainMenu({ gameState, onStartGame, onViewHistory, onView
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-purple-100 mb-4">
+              <p className="text-corporate-gold-100 mb-4">
                 Learn about each shark's background, investment preferences, 
                 and what they're looking for in a business.
               </p>
               <Button 
                 onClick={onViewSharks}
-                className="w-full bg-white text-purple-600 hover:bg-purple-50 font-semibold"
+                className="w-full bg-white text-corporate-gold-600 hover:bg-corporate-gold-50 font-semibold"
                 size="lg"
               >
                 View Shark Profiles
@@ -120,7 +121,7 @@ export default function MainMenu({ gameState, onStartGame, onViewHistory, onView
           </Card>
 
           {playerStats.totalDeals > 0 && (
-            <Card className="bg-gradient-to-br from-green-600 to-green-800 border-green-400 hover:scale-105 transition-transform cursor-pointer md:col-span-2">
+            <Card className="bg-gradient-to-br from-corporate-blue-500 to-corporate-gold-600 border-corporate-gold-400 hover:scale-105 transition-transform cursor-pointer md:col-span-2">
               <CardHeader>
                 <div className="flex items-center space-x-3">
                   <History className="w-8 h-8 text-white" />
@@ -128,13 +129,13 @@ export default function MainMenu({ gameState, onStartGame, onViewHistory, onView
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-green-100 mb-4">
+                <p className="text-white mb-4">
                   Review your past pitches, successful deals, and learn from your experience. 
                   See which sharks you've worked with and track your progress.
                 </p>
                 <Button 
                   onClick={onViewHistory}
-                  className="w-full bg-white text-green-600 hover:bg-green-50 font-semibold"
+                  className="w-full bg-white text-corporate-blue-600 hover:bg-corporate-blue-50 font-semibold"
                   size="lg"
                 >
                   View Past Deals

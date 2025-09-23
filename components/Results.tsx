@@ -17,6 +17,12 @@ export default function Results({ deal, playerStats, onNewGame, onBackToMenu }: 
   const shark = SHARKS.find(s => s.id === deal.finalOffer.sharkId);
   const wasSuccessful = deal.accepted;
 
+  // TODO: Add sound effects for results
+  // useEffect(() => {
+  //   const resultSound = new Audio(wasSuccessful ? '/sounds/success.mp3' : '/sounds/no-deal.mp3');
+  //   resultSound.play().catch(console.error);
+  // }, [wasSuccessful]);
+
   const getScoreChange = () => {
     return wasSuccessful ? '+10' : '-5';
   };
