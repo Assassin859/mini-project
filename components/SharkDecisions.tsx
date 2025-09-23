@@ -13,18 +13,18 @@ interface SharkDecisionsProps {
 }
 
 export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProps) {
-  const [currentShark, setCurrentShark] = useState(0);
-  const [decisions, setDecisions] = useState([] as SharkDecision[]);
+  const [currentSharkIndex, setCurrentSharkIndex] = useState(0);
+  const [allDecisions, setAllDecisions] = useState([] as SharkDecision[]);
   const [isRevealing, setIsRevealing] = useState(false);
-  const [showDecision, setShowDecision] = useState(false);
+  const [showDecisionContent, setShowDecisionContent] = useState(false);
 
+  // Generate all shark decisions initially
   useEffect(() => {
     const timer = setTimeout(async () => {
       try {
         // Generate AI decisions for each shark
         const generatedDecisions = SHARKS.map(shark => calculateSharkDecision(shark, pitch));
-        setDecisions(generatedDecisions);
-        revealSharkDecision();
+        setAllDecisions(generatedDecisions);
       } catch (e) {
         console.error('Failed to get shark decisions:', e);
         // Fallback: generate basic decisions
@@ -37,49 +37,48 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
             equity: Math.min(50, pitch.equityOffered * 1.5)
           } : undefined
         }));
-        setDecisions(fallbackDecisions);
-        revealSharkDecision();
+        setAllDecisions(fallbackDecisions);
       }
     }, 2000);
 
     return () => clearTimeout(timer);
   }, [pitch]);
 
-  const revealSharkDecision = () => {
-    if (currentShark >= SHARKS.length) return;
+  // Handle sequential display of shark decisions
+  useEffect(() => {
+    if (allDecisions.length === 0) return;
+    if (currentSharkIndex >= SHARKS.length) {
+      // All sharks have decided, complete after a delay
+      const timer = setTimeout(() => {
+        onComplete(allDecisions);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
 
+    // Start revealing current shark's decision
     setIsRevealing(true);
-    
-    const shark = SHARKS[currentShark];
-    const decision = decisions[currentShark];
+    setShowDecisionContent(false);
 
-    // Show thinking animation
-    setTimeout(() => {
-      setShowDecision(true);
+    // Show thinking animation, then reveal decision
+    const thinkingTimer = setTimeout(() => {
+      setShowDecisionContent(true);
       
-      // Move to next shark or complete
-      setTimeout(() => {
-        if (currentShark < SHARKS.length - 1) {
-          setCurrentShark(currentShark + 1);
+      // After showing decision, move to next shark
+      const nextTimer = setTimeout(() => {
+        if (currentSharkIndex < SHARKS.length - 1) {
+          setCurrentSharkIndex(currentSharkIndex + 1);
           setIsRevealing(false);
-          setShowDecision(false);
-          
-          // Auto-advance to next shark
-          setTimeout(() => {
-            revealSharkDecision();
-          }, 2000);
-        } else {
-          // All sharks have decided
-          setTimeout(() => {
-            onComplete(decisions);
-          }, 2000);
         }
       }, 3000);
+      
+      return () => clearTimeout(nextTimer);
     }, 2000);
-  };
 
-  const currentDecision = decisions[currentShark];
-  const shark = SHARKS[currentShark];
+    return () => clearTimeout(thinkingTimer);
+  }, [allDecisions, currentSharkIndex, onComplete]);
+
+  const currentDecision = allDecisions[currentSharkIndex];
+  const shark = SHARKS[currentSharkIndex];
 
   return (
     <div className="min-h-screen p-4">
@@ -98,13 +97,13 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
         <div className="mb-8">
           <div className="flex justify-center items-center space-x-4 mb-4">
             <span className="text-slate-300">
-              Shark {currentShark + 1} of {SHARKS.length}
+              Shark {currentSharkIndex + 1} of {SHARKS.length}
             </span>
           </div>
           <div className="w-full bg-slate-700 rounded-full h-3">
             <div 
               className="bg-blue-500 h-3 rounded-full transition-all duration-1000"
-              style={{ width: `${((currentShark + (showDecision ? 1 : 0)) / SHARKS.length) * 100}%` }}
+              style={{ width: `${((currentSharkIndex + (showDecisionContent ? 1 : 0)) / SHARKS.length) * 100}%` }}
             />
           </div>
         </div>
@@ -202,11 +201,11 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
         </div>
 
         {/* Previous Decisions */}
-        {decisions.length > 0 && (
+        {allDecisions.length > 0 && (
           <div className="mt-8">
             <h3 className="text-xl font-bold text-white mb-4">Previous Decisions</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {decisions.slice(0, currentShark).map((decision: SharkDecision, index: number) => {
+              {allDecisions.slice(0, currentSharkIndex).map((decision: SharkDecision, index: number) => {
                 const sharkInfo = SHARKS[index];
                 return (
                   <Card key={index} className={`bg-slate-800/30 border-slate-600 ${decision.isOut ? 'opacity-50' : ''}`}>
