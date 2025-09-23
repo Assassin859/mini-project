@@ -15,7 +15,7 @@ interface LobbyManagerProps {
 }
 
 export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
-  const { gameState, playerName, updatePlayerName, createRoom, joinRoom, playerId, isInitialized } = useMultiplayer();
+  const { gameState, playerName, updatePlayerName, createRoom, joinRoom, playerId, isInitialized, sendGameAction } = useMultiplayer();
   const [availableRooms, setAvailableRooms] = useState([] as { id: string; name: string; current_players: number; max_players: number }[]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showJoinForm, setShowJoinForm] = useState(false);
@@ -78,11 +78,15 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
   };
 
   const handleReadyUp = async () => {
-    // Implementation for ready up functionality
+    if (!gameState.currentRoom || !playerId) return;
+    await sendGameAction({ type: 'READY_UP' });
   };
 
   const handleStartGame = async () => {
-    // Implementation for starting the game
+    if (!gameState.currentRoom || !playerId) return;
+    // Only host should start the game
+    if (!gameState.currentPlayer?.isHost) return;
+    await sendGameAction({ type: 'START_GAME' });
     onGameStart();
   };
 
