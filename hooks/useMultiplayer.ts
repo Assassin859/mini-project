@@ -63,53 +63,8 @@ export function useMultiplayer() {
   }, []);
 
   const handleGameAction = useCallback((_action: GameAction) => {
-    // Handle real-time game actions
+    // Multiplayer removed: no-op
     return;
-    
-    setGameState((prev: MultiplayerGameState) => {
-      if (!prev.currentRoom) return prev;
-      
-      const updatedRoom: RoomState = {
-        ...prev.currentRoom,
-        players: Array.isArray(prev.currentRoom.players) ? [...prev.currentRoom.players] : [],
-        deals: Array.isArray(prev.currentRoom.deals) ? [...prev.currentRoom.deals] : [],
-      };
-      
-      switch (action.type) {
-        case 'READY_UP':
-          const playerIndex = updatedRoom.players.findIndex(p => p.id === action.playerId);
-          if (playerIndex !== -1) {
-            updatedRoom.players[playerIndex].isReady = true;
-          }
-          break;
-        case 'START_GAME':
-          updatedRoom.status = 'in_progress';
-          updatedRoom.gamePhase = GamePhase.PITCH_BUILDER;
-          break;
-        case 'SUBMIT_PITCH':
-          updatedRoom.currentPitch = action.payload;
-          updatedRoom.gamePhase = GamePhase.PRESENTATION;
-          break;
-        case 'MAKE_DECISION':
-          updatedRoom.sharkDecisions = action.payload;
-          updatedRoom.gamePhase = GamePhase.NEGOTIATION;
-          break;
-        case 'NEGOTIATE':
-          updatedRoom.deals = [...(updatedRoom.deals || []), action.payload];
-          updatedRoom.gamePhase = GamePhase.RESULTS;
-          break;
-        case 'NEXT_TURN':
-          updatedRoom.currentPlayerTurn = action.payload.nextPlayerId;
-          updatedRoom.gamePhase = GamePhase.PITCH_BUILDER;
-          updatedRoom.roundNumber = (updatedRoom.roundNumber || 1) + 1;
-          break;
-      }
-      
-      return {
-        ...prev,
-        currentRoom: updatedRoom,
-      };
-    });
   }, []);
 
   const createRoom = useCallback(async (_roomName: string, _maxPlayers: number = 4) => {
