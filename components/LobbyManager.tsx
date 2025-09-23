@@ -288,7 +288,16 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
                       min="2"
                       max="6"
                       value={maxPlayers}
-                      onChange={(e: { target: { value: string } }) => setMaxPlayers(parseInt(e.target.value))}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        const raw = e.target.value;
+                        const next = e.target.valueAsNumber;
+                        if (Number.isNaN(next)) {
+                          if (raw === "") return;
+                          return;
+                        }
+                        const clamped = Math.max(2, Math.min(6, Math.round(next)));
+                        setMaxPlayers(clamped);
+                      }}
                       className="bg-slate-700 border-slate-600 text-white"
                     />
                   </div>

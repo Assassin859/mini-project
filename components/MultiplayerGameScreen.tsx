@@ -121,6 +121,13 @@ export default function MultiplayerGameScreen({ onBackToLobby }: MultiplayerGame
         );
       
       case GamePhase.RESULTS:
+        if (!Array.isArray(currentRoom.deals) || currentRoom.deals.length === 0) {
+          return (
+            <div className="min-h-screen flex items-center justify-center">
+              <div className="text-white text-xl">No results available yet.</div>
+            </div>
+          );
+        }
         const latestDeal = currentRoom.deals[currentRoom.deals.length - 1];
         return (
           <Results 
