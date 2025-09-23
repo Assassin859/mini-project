@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BusinessPitch, SharkDecision } from '@/types/game';
 import { SHARKS } from '@/lib/sharks';
-import { supabase } from '@/lib/supabase';
+import { calculateSharkDecision } from '@/lib/ai-logic';
 
 interface SharkDecisionsProps {
   pitch: BusinessPitch;
@@ -19,24 +19,11 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
   const [showDecision, setShowDecision] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(async () => {
-      try {
-        const { data, error } = await supabase.functions.invoke('shark-decision-maker', {
-          body: { sharks: SHARKS, pitch }
-        });
-        if (error) throw error;
-        if (data?.decisions) {
-          // Preload all decisions; reveal sequentially
-          setDecisions(data.decisions as SharkDecision[]);
-          revealSharkDecision();
-        }
-      } catch (e) {
-        console.error('Failed to get shark decisions:', e);
-      }
-    }, 2000);
-
+    const timer = setTimeout(() => {
+      revealSharkDecision();
+    }, 1000);
     return () => clearTimeout(timer);
-  }, [pitch]);
+  }, []);
 
   const revealSharkDecision = () => {
     if (currentShark >= SHARKS.length) return;
@@ -44,11 +31,12 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
     setIsRevealing(true);
     
     const shark = SHARKS[currentShark];
-    const decision = decisions[currentShark];
+    const decision = calculateSharkDecision(shark, pitch);
 
     // Show thinking animation
     setTimeout(() => {
       setShowDecision(true);
+      setDecisions(prev => [...prev, decision]);
       
       // Move to next shark or complete
       setTimeout(() => {
@@ -64,7 +52,8 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
         } else {
           // All sharks have decided
           setTimeout(() => {
-            onComplete(decisions);
+            const all = [...decisions, decision];
+            onComplete(all);
           }, 2000);
         }
       }, 3000);
