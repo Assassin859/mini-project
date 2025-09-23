@@ -139,7 +139,6 @@ export function useMultiplayer() {
   }, []);
 
   const createRoom = useCallback(async (roomName: string, maxPlayers: number = 4) => {
-<<<<<<< HEAD
     if (!playerId || !playerName.trim()) {
       setGameState((prev: MultiplayerGameState) => ({ ...prev, error: 'Player ID or name is required' }));
       return null;
@@ -150,13 +149,6 @@ export function useMultiplayer() {
       return null;
     }
 
-=======
-    if (!playerName.trim()) {
-      setGameState((prev: MultiplayerGameState) => ({ ...prev, error: 'Player name is required' }));
-      return null;
-    }
-
->>>>>>> cursor/refine-shark-tank-simulator-backend-logic-193e
     setGameState((prev: MultiplayerGameState) => ({ ...prev, isLoading: true, error: null }));
 
     try {
@@ -240,7 +232,6 @@ export function useMultiplayer() {
   }, [playerId, playerName, subscribeToRoom]);
 
   const joinRoom = useCallback(async (roomId: string) => {
-<<<<<<< HEAD
     if (!playerId || !playerName.trim()) {
       setGameState((prev: MultiplayerGameState) => ({ ...prev, error: 'Player ID or name is required' }));
       return false;
@@ -250,14 +241,6 @@ export function useMultiplayer() {
       setGameState((prev: MultiplayerGameState) => ({ ...prev, error: 'Player name is required' }));
       return false;
     }
-
-=======
-    if (!playerName.trim()) {
-      setGameState((prev: MultiplayerGameState) => ({ ...prev, error: 'Player name is required' }));
-      return false;
-    }
-
->>>>>>> cursor/refine-shark-tank-simulator-backend-logic-193e
     setGameState((prev: MultiplayerGameState) => ({ ...prev, isLoading: true, error: null }));
 
     try {
