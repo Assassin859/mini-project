@@ -1,15 +1,40 @@
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Credentials': 'true',
+// Configure CORS to properly handle preflight and credentials
+function getCorsHeaders(req: Request) {
+  const requestOrigin = req.headers.get('Origin') || ''
+  const allowedOrigins = new Set([
+    'https://sharktanksimulator.netlify.app',
+    'http://localhost:3000',
+    'http://localhost:5173',
+  ])
+
+  const allowOrigin = allowedOrigins.has(requestOrigin) ? requestOrigin : 'https://sharktanksimulator.netlify.app'
+
+  return {
+    'Access-Control-Allow-Origin': allowOrigin,
+    'Vary': 'Origin',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    // Will be overridden for preflight to echo request headers if provided
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    // Only safe to include when not using wildcard origin
+    'Access-Control-Allow-Credentials': 'true',
+  } as Record<string, string>
 }
 
 Deno.serve(async (req: Request) => {
+  const baseCors = getCorsHeaders(req)
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    const requestedHeaders = req.headers.get('Access-Control-Request-Headers')
+    const preflightHeaders: Record<string, string> = {
+      ...baseCors,
+      'Access-Control-Max-Age': '86400',
+    }
+    if (requestedHeaders) {
+      preflightHeaders['Access-Control-Allow-Headers'] = requestedHeaders
+    }
+    return new Response(null, { headers: preflightHeaders, status: 204 })
   }
 
   try {
@@ -23,7 +48,7 @@ Deno.serve(async (req: Request) => {
     if (!roomId || !action || !action.type) {
       return new Response(
         JSON.stringify({ error: 'INVALID_REQUEST', message: 'Missing roomId or action.type' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 },
+        { headers: { ...baseCors, 'Content-Type': 'application/json' }, status: 400 },
       )
     }
 
@@ -58,13 +83,13 @@ Deno.serve(async (req: Request) => {
         if (phase && phase !== 'pitch_builder') {
           return new Response(
             JSON.stringify({ error: 'INVALID_PHASE', message: `Cannot SUBMIT_PITCH during ${phase}` }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 409 },
+            { headers: { ...baseCors, 'Content-Type': 'application/json' }, status: 409 },
           )
         }
         if (!action.payload || typeof action.payload !== 'object') {
           return new Response(
             JSON.stringify({ error: 'INVALID_PAYLOAD', message: 'SUBMIT_PITCH requires payload' }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 },
+            { headers: { ...baseCors, 'Content-Type': 'application/json' }, status: 400 },
           )
         }
         updatedGameState.currentPitch = action.payload
@@ -75,13 +100,13 @@ Deno.serve(async (req: Request) => {
         if (phase && phase !== 'presentation') {
           return new Response(
             JSON.stringify({ error: 'INVALID_PHASE', message: `Cannot MAKE_DECISION during ${phase}` }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 409 },
+            { headers: { ...baseCors, 'Content-Type': 'application/json' }, status: 409 },
           )
         }
         if (!Array.isArray(action.payload)) {
           return new Response(
             JSON.stringify({ error: 'INVALID_PAYLOAD', message: 'MAKE_DECISION requires array payload' }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 },
+            { headers: { ...baseCors, 'Content-Type': 'application/json' }, status: 400 },
           )
         }
         updatedGameState.sharkDecisions = action.payload
@@ -92,13 +117,13 @@ Deno.serve(async (req: Request) => {
         if (phase && phase !== 'negotiation') {
           return new Response(
             JSON.stringify({ error: 'INVALID_PHASE', message: `Cannot NEGOTIATE during ${phase}` }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 409 },
+            { headers: { ...baseCors, 'Content-Type': 'application/json' }, status: 409 },
           )
         }
         if (!action.payload || typeof action.payload !== 'object') {
           return new Response(
             JSON.stringify({ error: 'INVALID_PAYLOAD', message: 'NEGOTIATE requires payload' }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 },
+            { headers: { ...baseCors, 'Content-Type': 'application/json' }, status: 400 },
           )
         }
 
@@ -158,7 +183,7 @@ Deno.serve(async (req: Request) => {
         if (!action.payload || typeof action.payload?.nextPlayerId !== 'string') {
           return new Response(
             JSON.stringify({ error: 'INVALID_PAYLOAD', message: 'NEXT_TURN requires payload.nextPlayerId' }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 },
+            { headers: { ...baseCors, 'Content-Type': 'application/json' }, status: 400 },
           )
         }
         updatedGameState.currentPlayerTurn = action.payload.nextPlayerId
@@ -170,7 +195,7 @@ Deno.serve(async (req: Request) => {
         if (!action.playerId) {
           return new Response(
             JSON.stringify({ error: 'INVALID_PAYLOAD', message: 'READY_UP requires playerId' }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 },
+            { headers: { ...baseCors, 'Content-Type': 'application/json' }, status: 400 },
           )
         }
         const readyPlayerIndex = players.findIndex(p => p.id === action.playerId)
@@ -182,9 +207,9 @@ Deno.serve(async (req: Request) => {
       case 'START_GAME':
         if (!Array.isArray(players) || players.length === 0) {
           return new Response(
-            JSON.stringify({ error: 'INVALID_STATE', message: 'No players in room to start game' }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 409 },
-          )
+          JSON.stringify({ error: 'INVALID_STATE', message: 'No players in room to start game' }),
+          { headers: { ...baseCors, 'Content-Type': 'application/json' }, status: 409 },
+        )
         }
         // Initialize all players readiness if missing
         updatedGameState.players = players.map((p: any) => ({
@@ -206,7 +231,7 @@ Deno.serve(async (req: Request) => {
       default:
         return new Response(
           JSON.stringify({ error: 'UNKNOWN_ACTION', message: `Unsupported action ${action.type}` }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 },
+          { headers: { ...baseCors, 'Content-Type': 'application/json' }, status: 400 },
         )
     }
 
@@ -226,13 +251,13 @@ Deno.serve(async (req: Request) => {
 
     console.log('[game-action] Updated game_state successfully', { roomId, actionType: action.type })
     return new Response(JSON.stringify({ success: true }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...baseCors, 'Content-Type': 'application/json' },
       status: 200,
     })
   } catch (error) {
     console.error('[game-action] Error', { error: String((error as any)?.message || error) })
     return new Response(JSON.stringify({ error: 'UNEXPECTED_ERROR', message: (error as any)?.message || String(error) }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...baseCors, 'Content-Type': 'application/json' },
       status: 500,
     })
   }
