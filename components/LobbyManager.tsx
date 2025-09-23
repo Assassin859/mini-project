@@ -15,7 +15,7 @@ interface LobbyManagerProps {
 }
 
 export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
-  const { gameState, playerName, updatePlayerName, createRoom, joinRoom, playerId, isInitialized, sendGameAction } = useMultiplayer();
+  const { gameState, playerName, updatePlayerName, playerId, isInitialized } = useMultiplayer();
   const [availableRooms, setAvailableRooms] = useState([] as { id: string; name: string; current_players: number; max_players: number }[]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showJoinForm, setShowJoinForm] = useState(false);
@@ -47,29 +47,11 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
   };
 
   const handleCreateRoom = async () => {
-    if (!roomName.trim() || !playerName.trim() || !playerId) return;
-    
-    setIsLoading(true);
-    const roomId = await createRoom(roomName, maxPlayers);
-    setIsLoading(false);
-    
-    if (roomId) {
-      setShowCreateForm(false);
-      setRoomName('');
-    }
+    alert('Multiplayer is currently disabled.');
   };
 
-  const handleJoinRoom = async (roomId: string) => {
-    if (!playerName.trim() || !playerId) return;
-    
-    setIsLoading(true);
-    const success = await joinRoom(roomId);
-    setIsLoading(false);
-    
-    if (success) {
-      setShowJoinForm(false);
-      setRoomCode('');
-    }
+  const handleJoinRoom = async (_roomId: string) => {
+    alert('Multiplayer is currently disabled.');
   };
 
   const handleJoinByCode = async () => {
@@ -78,16 +60,11 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
   };
 
   const handleReadyUp = async () => {
-    if (!gameState.currentRoom || !playerId) return;
-    await sendGameAction({ type: 'READY_UP' });
+    alert('Multiplayer is currently disabled.');
   };
 
   const handleStartGame = async () => {
-    if (!gameState.currentRoom || !playerId) return;
-    // Only host should start the game
-    if (!gameState.currentPlayer?.isHost) return;
-    await sendGameAction({ type: 'START_GAME' });
-    onGameStart();
+    alert('Multiplayer is currently disabled.');
   };
 
   // Show loading state while initializing
@@ -209,10 +186,8 @@ export default function LobbyManager({ onGameStart }: LobbyManagerProps) {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-4">🦈 Multiplayer Lobby</h1>
-          <p className="text-xl text-slate-300">
-            Create or join a room to play with other entrepreneurs
-          </p>
+          <h1 className="text-4xl font-bold text-white mb-4">🦈 Multiplayer Disabled</h1>
+          <p className="text-xl text-slate-300">Multiplayer room creation and joining are currently disabled.</p>
         </div>
 
         {/* Player Name Input */}
