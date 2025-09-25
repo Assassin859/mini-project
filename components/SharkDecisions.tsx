@@ -140,7 +140,7 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
                     <div className="w-16 h-16 bg-slate-600 rounded-full mx-auto"></div>
                   </div>
                 </div>
-              ) : !showDecision ? (
+              ) : !showDecisionContent ? (
                 <div className="text-center">
                   <h3 className="text-2xl font-bold text-white mb-4">
                     {shark.name} is thinking...
@@ -152,7 +152,7 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
                   </div>
                 </div>
               ) : (
-                <div className={`text-center transition-all duration-1000 ${showDecision ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+                <div className={`text-center transition-all duration-1000 ${showDecisionContent ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
                   {currentDecision?.isOut ? (
                     <div>
                       {/* TODO: Add sound effect for shark going out */}
