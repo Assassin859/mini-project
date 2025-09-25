@@ -5,6 +5,7 @@ import { GameState, GamePhase, PlayerStats, Deal } from '@/types/game';
 import { loadGameData, saveGameData } from '@/lib/storage';
 import MainMenu from '@/components/MainMenu';
 import GameScreen from '@/components/GameScreen';
+import MultiplayerLobby from '@/components/MultiplayerLobby';
 
 const initialPlayerStats: PlayerStats = {
   totalDeals: 0,
@@ -26,6 +27,9 @@ const initialGameState: GameState = {
 export default function Home() {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [roomId, setRoomId] = useState<string | null>(null);
+  const [playerId, setPlayerId] = useState<string | null>(null);
+  const [playerName, setPlayerName] = useState<string | null>(null);
 
   // Load game data from localStorage on mount
   useEffect(() => {
@@ -73,6 +77,22 @@ export default function Home() {
     }));
   };
 
+  const handleViewMultiplayerLobby = () => {
+    setGameState(prev => ({
+      ...prev,
+      phase: GamePhase.MULTIPLAYER_LOBBY
+    }));
+  };
+
+  const handleJoinRoom = (roomId: string, playerId: string, playerName: string) => {
+    setRoomId(roomId);
+    setPlayerId(playerId);
+    setPlayerName(playerName);
+    setGameState(prev => ({
+      ...prev,
+      phase: GamePhase.PITCH_BUILDER
+    }));
+  };
   const handlePhaseChange = (phase: GamePhase, data?: any) => {
     setGameState(prev => ({
       ...prev,
@@ -104,12 +124,21 @@ export default function Home() {
           onStartGame={handleStartGame}
           onViewHistory={handleViewHistory}
           onViewSharks={handleViewSharks}
+          onViewMultiplayerLobby={handleViewMultiplayerLobby}
+        />
+      ) : gameState.phase === GamePhase.MULTIPLAYER_LOBBY ? (
+        <MultiplayerLobby
+          onBack={() => setGameState(prev => ({ ...prev, phase: GamePhase.MENU }))}
+          onJoinRoom={handleJoinRoom}
         />
       ) : (
         <GameScreen
           gameState={gameState}
           onPhaseChange={handlePhaseChange}
           onUpdateGameState={handleUpdateGameState}
+          roomId={roomId}
+          playerId={playerId}
+          playerName={playerName}
         />
       )}
     </div>

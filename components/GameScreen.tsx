@@ -17,9 +17,19 @@ interface GameScreenProps {
   gameState: GameState;
   onPhaseChange: (phase: GamePhase, data?: any) => void;
   onUpdateGameState: (updates: Partial<GameState>) => void;
+  roomId?: string | null;
+  playerId?: string | null;
+  playerName?: string | null;
 }
 
-export default function GameScreen({ gameState, onPhaseChange, onUpdateGameState }: GameScreenProps) {
+export default function GameScreen({ 
+  gameState, 
+  onPhaseChange, 
+  onUpdateGameState, 
+  roomId, 
+  playerId, 
+  playerName 
+}: GameScreenProps) {
   const handleBackToMenu = () => {
     onPhaseChange(GamePhase.MENU);
   };
@@ -152,9 +162,17 @@ export default function GameScreen({ gameState, onPhaseChange, onUpdateGameState
             </Button>
             <div className="text-2xl">🦈</div>
             <h1 className="text-xl font-bold text-white">Shark Tank Simulator</h1>
+            {roomId && (
+              <div className="text-sm text-slate-400">
+                Room: {roomId.slice(0, 8)}...
+              </div>
+            )}
           </div>
           
           <div className="text-right text-slate-300">
+            {playerName && (
+              <div className="text-sm">Player: {playerName}</div>
+            )}
             <div className="text-sm">Entrepreneur Score</div>
             <div className="text-lg font-bold text-white">{gameState.playerStats.entrepreneurScore}</div>
           </div>

@@ -22,9 +22,10 @@ interface MainMenuProps {
   onStartGame: () => void;
   onViewHistory: () => void;
   onViewSharks: () => void;
+  onViewMultiplayerLobby: () => void;
 }
 
-export default function MainMenu({ gameState, onStartGame, onViewHistory, onViewSharks }: MainMenuProps) {
+export default function MainMenu({ gameState, onStartGame, onViewHistory, onViewSharks, onViewMultiplayerLobby }: MainMenuProps) {
   const { playerStats, gameHistory } = gameState;
   
   const getScoreLevel = (score: number) => {
@@ -99,6 +100,14 @@ export default function MainMenu({ gameState, onStartGame, onViewHistory, onView
                 >
                   <Play className="w-6 h-6 mr-3" />
                   Start New Pitch
+                </Button>
+
+                <Button 
+                  onClick={onViewMultiplayerLobby}
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-xl py-6"
+                >
+                  <Users className="w-6 h-6 mr-3" />
+                  Play Multiplayer
                 </Button>
               </CardContent>
             </Card>
