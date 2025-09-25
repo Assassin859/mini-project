@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/lib/supabase';
 import { 
   ArrowLeft, 
@@ -35,6 +36,7 @@ interface MultiplayerLobbyProps {
 export default function MultiplayerLobby({ onBack, onJoinRoom }: MultiplayerLobbyProps) {
   const [playerName, setPlayerName] = useState('');
   const [roomName, setRoomName] = useState('');
+  const [maxPlayers, setMaxPlayers] = useState(4);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -86,7 +88,7 @@ export default function MultiplayerLobby({ onBack, onJoinRoom }: MultiplayerLobb
         .insert({
           name: roomName.trim(),
           host_id: playerId,
-          max_players: 4,
+          max_players: maxPlayers,
           current_players: 1,
           status: 'waiting',
           game_state: {
@@ -298,6 +300,22 @@ export default function MultiplayerLobby({ onBack, onJoinRoom }: MultiplayerLobb
                   className="bg-slate-800 border-slate-600 text-white"
                   maxLength={30}
                 />
+              </div>
+
+              <div>
+                <Label className="text-slate-300">Max Players</Label>
+                <Select value={maxPlayers.toString()} onValueChange={(value) => setMaxPlayers(parseInt(value))}>
+                  <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
+                    <SelectValue placeholder="Select max players" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="2">2 Players</SelectItem>
+                    <SelectItem value="3">3 Players</SelectItem>
+                    <SelectItem value="4">4 Players</SelectItem>
+                    <SelectItem value="5">5 Players</SelectItem>
+                    <SelectItem value="6">6 Players</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <Button 

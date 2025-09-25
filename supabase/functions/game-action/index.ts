@@ -189,7 +189,7 @@ Deno.serve(async (req: Request) => {
         // Initialize all players readiness if missing
         updatedGameState.players = players.map((p: any) => ({
           ...p,
-          isReady: p?.isReady ?? true,
+          isReady: p?.isReady || false,
           stats: {
             totalDeals: safeNumber(p?.stats?.totalDeals),
             successfulDeals: safeNumber(p?.stats?.successfulDeals),

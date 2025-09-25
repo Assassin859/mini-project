@@ -1,6 +1,7 @@
 export enum GamePhase {
   MENU = 'menu',
   MULTIPLAYER_LOBBY = 'multiplayer_lobby',
+  IN_ROOM_WAITING = 'in_room_waiting',
   PITCH_BUILDER = 'pitch_builder',
   PRESENTATION = 'presentation',
   SHARK_DECISIONS = 'shark_decisions',

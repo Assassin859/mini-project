@@ -6,6 +6,7 @@ import { loadGameData, saveGameData } from '@/lib/storage';
 import MainMenu from '@/components/MainMenu';
 import GameScreen from '@/components/GameScreen';
 import MultiplayerLobby from '@/components/MultiplayerLobby';
+import InRoomLobby from '@/components/InRoomLobby';
 
 const initialPlayerStats: PlayerStats = {
   totalDeals: 0,
@@ -90,7 +91,7 @@ export default function Home() {
     setPlayerName(playerName);
     setGameState(prev => ({
       ...prev,
-      phase: GamePhase.PITCH_BUILDER
+      phase: GamePhase.IN_ROOM_WAITING
     }));
   };
   const handlePhaseChange = (phase: GamePhase, data?: any) => {
@@ -130,6 +131,14 @@ export default function Home() {
         <MultiplayerLobby
           onBack={() => setGameState(prev => ({ ...prev, phase: GamePhase.MENU }))}
           onJoinRoom={handleJoinRoom}
+        />
+      ) : gameState.phase === GamePhase.IN_ROOM_WAITING ? (
+        <InRoomLobby
+          roomId={roomId!}
+          playerId={playerId!}
+          playerName={playerName!}
+          onPhaseChange={handlePhaseChange}
+          onUpdateGameState={handleUpdateGameState}
         />
       ) : (
         <GameScreen
