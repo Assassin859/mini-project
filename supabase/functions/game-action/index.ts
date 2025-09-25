@@ -13,9 +13,29 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    // Check for required environment variables
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    
+    if (!supabaseUrl) {
+      console.error('[game-action] Missing SUPABASE_URL environment variable')
+      return new Response(
+        JSON.stringify({ error: 'CONFIGURATION_ERROR', message: 'Missing SUPABASE_URL environment variable' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 },
+      )
+    }
+    
+    if (!supabaseServiceKey) {
+      console.error('[game-action] Missing SUPABASE_SERVICE_ROLE_KEY environment variable')
+      return new Response(
+        JSON.stringify({ error: 'CONFIGURATION_ERROR', message: 'Missing SUPABASE_SERVICE_ROLE_KEY environment variable' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 },
+      )
+    }
+
     const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      supabaseUrl,
+      supabaseServiceKey,
     )
 
     const { roomId, action } = await req.json()
