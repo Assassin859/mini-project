@@ -13,22 +13,22 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    // Check for required environment variables
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    // Get environment variables - these should match the secret names in Supabase
+    const supabaseUrl = Deno.env.get('URL') || Deno.env.get('SUPABASE_URL')
+    const supabaseServiceKey = Deno.env.get('SERVICE_ROLE_KEY') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     
     if (!supabaseUrl) {
-      console.error('[game-action] Missing SUPABASE_URL environment variable')
+      console.error('[game-action] Missing URL or SUPABASE_URL environment variable')
       return new Response(
-        JSON.stringify({ error: 'CONFIGURATION_ERROR', message: 'Missing SUPABASE_URL environment variable' }),
+        JSON.stringify({ error: 'CONFIGURATION_ERROR', message: 'Missing URL environment variable' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 },
       )
     }
     
     if (!supabaseServiceKey) {
-      console.error('[game-action] Missing SUPABASE_SERVICE_ROLE_KEY environment variable')
+      console.error('[game-action] Missing SERVICE_ROLE_KEY or SUPABASE_SERVICE_ROLE_KEY environment variable')
       return new Response(
-        JSON.stringify({ error: 'CONFIGURATION_ERROR', message: 'Missing SUPABASE_SERVICE_ROLE_KEY environment variable' }),
+        JSON.stringify({ error: 'CONFIGURATION_ERROR', message: 'Missing SERVICE_ROLE_KEY environment variable' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 },
       )
     }
