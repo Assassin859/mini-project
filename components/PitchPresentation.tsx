@@ -153,7 +153,8 @@ export default function PitchPresentation({ pitch, onComplete }: PitchPresentati
             setCurrentSlide(currentSlide + 1);
             return 15;
           } else {
-            onComplete();
+            // Use setTimeout to avoid setState during render
+            setTimeout(() => onComplete(), 0);
             return 0;
           }
         }
@@ -162,7 +163,7 @@ export default function PitchPresentation({ pitch, onComplete }: PitchPresentati
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [currentSlide, onComplete]);
+  }, [currentSlide, onComplete, slides.length]);
 
   return (
     <div className="min-h-screen p-4 flex items-center">

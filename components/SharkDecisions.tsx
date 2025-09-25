@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BusinessPitch, SharkDecision } from '@/types/game';
@@ -72,6 +72,23 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
 
   const currentDecision = allDecisions[currentSharkIndex];
   const shark = SHARKS[currentSharkIndex];
+
+  // Guard against undefined shark or when all sharks are done
+  if (!shark || currentSharkIndex >= SHARKS.length) {
+    return (
+      <div className="min-h-screen p-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🦈</div>
+          <h1 className="text-2xl font-bold text-white mb-4">
+            Processing Results...
+          </h1>
+          <div className="animate-pulse">
+            <div className="w-16 h-16 bg-slate-600 rounded-full mx-auto"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen p-4">
@@ -200,6 +217,8 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {allDecisions.slice(0, currentSharkIndex).map((decision: SharkDecision, index: number) => {
                 const sharkInfo = SHARKS[index];
+                if (!sharkInfo) return null;
+                
                 return (
                   <Card key={index} className={`bg-slate-800/30 border-slate-600 ${decision.isOut ? 'opacity-50' : ''}`}>
                     <CardContent className="p-4">

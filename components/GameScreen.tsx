@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from 'react';
 import { GameState, GamePhase } from '@/types/game';
 import PitchBuilder from './PitchBuilder';
 import PitchPresentation from './PitchPresentation';
@@ -23,12 +24,51 @@ export default function GameScreen({ gameState, onPhaseChange, onUpdateGameState
     onPhaseChange(GamePhase.MENU);
   };
 
+  // Memoize callbacks to prevent unnecessary re-renders
+  const handlePitchComplete = useCallback((pitch: any) => {
+    onPhaseChange(GamePhase.PRESENTATION, pitch);
+  }, [onPhaseChange]);
+
+  const handlePresentationComplete = useCallback(() => {
+    onPhaseChange(GamePhase.SHARK_DECISIONS);
+  }, [onPhaseChange]);
+
+  const handleSharkDecisionsComplete = useCallback((decisions: any) => {
+    onUpdateGameState({ sharkDecisions: decisions });
+    onPhaseChange(GamePhase.POST_SHARK_DECISIONS);
+  }, [onUpdateGameState, onPhaseChange]);
+
+  const handleNegotiationComplete = useCallback((deal: any) => {
+    // Update game history and stats
+    const newHistory = [...gameState.gameHistory, deal];
+    const newStats = {
+      totalDeals: gameState.playerStats.totalDeals + 1,
+      successfulDeals: gameState.playerStats.successfulDeals + (deal.accepted ? 1 : 0),
+      totalMoneyRaised: gameState.playerStats.totalMoneyRaised + (deal.accepted ? deal.finalTerms.amount : 0),
+      averageEquity: newHistory.filter(d => d.accepted).length > 0 
+        ? newHistory.filter(d => d.accepted).reduce((sum, d) => sum + d.finalTerms.equity, 0) / newHistory.filter(d => d.accepted).length 
+        : gameState.playerStats.averageEquity,
+      entrepreneurScore: Math.min(1000, gameState.playerStats.entrepreneurScore + (deal.accepted ? 10 : -5))
+    };
+    
+    onUpdateGameState({
+      gameHistory: newHistory,
+      playerStats: newStats
+    });
+    
+    onPhaseChange(GamePhase.RESULTS, deal);
+  }, [gameState.gameHistory, gameState.playerStats, onUpdateGameState, onPhaseChange]);
+
+  const handleNewGame = useCallback(() => {
+    onPhaseChange(GamePhase.PITCH_BUILDER);
+  }, [onPhaseChange]);
+
   const renderPhaseComponent = () => {
     switch (gameState.phase) {
       case GamePhase.PITCH_BUILDER:
         return (
           <PitchBuilder 
-            onComplete={(pitch) => onPhaseChange(GamePhase.PRESENTATION, pitch)}
+            onComplete={handlePitchComplete}
             onBack={handleBackToMenu}
             entrepreneurScore={gameState.playerStats.entrepreneurScore}
           />
@@ -38,7 +78,7 @@ export default function GameScreen({ gameState, onPhaseChange, onUpdateGameState
         return (
           <PitchPresentation 
             pitch={gameState.currentPitch!}
-            onComplete={() => onPhaseChange(GamePhase.SHARK_DECISIONS)}
+            onComplete={handlePresentationComplete}
           />
         );
       
@@ -46,10 +86,7 @@ export default function GameScreen({ gameState, onPhaseChange, onUpdateGameState
         return (
           <SharkDecisions 
             pitch={gameState.currentPitch!}
-            onComplete={(decisions) => {
-              onUpdateGameState({ sharkDecisions: decisions });
-              onPhaseChange(GamePhase.POST_SHARK_DECISIONS);
-            }}
+            onComplete={handleSharkDecisionsComplete}
           />
         );
 
@@ -67,26 +104,7 @@ export default function GameScreen({ gameState, onPhaseChange, onUpdateGameState
           <Negotiation 
             pitch={gameState.currentPitch!}
             decisions={gameState.sharkDecisions!}
-            onComplete={(deal) => {
-              // Update game history and stats
-              const newHistory = [...gameState.gameHistory, deal];
-              const newStats = {
-                totalDeals: gameState.playerStats.totalDeals + 1,
-                successfulDeals: gameState.playerStats.successfulDeals + (deal.accepted ? 1 : 0),
-                totalMoneyRaised: gameState.playerStats.totalMoneyRaised + (deal.accepted ? deal.finalTerms.amount : 0),
-                averageEquity: newHistory.filter(d => d.accepted).length > 0 
-                  ? newHistory.filter(d => d.accepted).reduce((sum, d) => sum + d.finalTerms.equity, 0) / newHistory.filter(d => d.accepted).length 
-                  : gameState.playerStats.averageEquity,
-                entrepreneurScore: Math.min(1000, gameState.playerStats.entrepreneurScore + (deal.accepted ? 10 : -5))
-              };
-              
-              onUpdateGameState({
-                gameHistory: newHistory,
-                playerStats: newStats
-              });
-              
-              onPhaseChange(GamePhase.RESULTS, deal);
-            }}
+            onComplete={handleNegotiationComplete}
           />
         );
       
@@ -95,7 +113,7 @@ export default function GameScreen({ gameState, onPhaseChange, onUpdateGameState
           <Results 
             deal={gameState.gameHistory[gameState.gameHistory.length - 1]}
             playerStats={gameState.playerStats}
-            onNewGame={() => onPhaseChange(GamePhase.PITCH_BUILDER)}
+            onNewGame={handleNewGame}
             onBackToMenu={handleBackToMenu}
           />
         );
