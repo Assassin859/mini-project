@@ -106,8 +106,8 @@ Deno.serve(async (req: Request) => {
 
   try {
     const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      Deno.env.get('URL') ?? '',
+      Deno.env.get('SERVICE_ROLE_KEY') ?? '',
     )
     // not used now, but ready for future auth/lookup
     void supabaseClient
