@@ -40,6 +40,7 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
   // Handle sequential display of shark decisions
   useEffect(() => {
     if (allDecisions.length === 0) return;
+    
     if (currentSharkIndex >= SHARKS.length) {
       // All sharks have decided, complete after a delay
       const timer = setTimeout(() => {
@@ -58,11 +59,9 @@ export default function SharkDecisions({ pitch, onComplete }: SharkDecisionsProp
       
       // After showing decision, move to next shark
       const nextTimer = setTimeout(() => {
-        if (currentSharkIndex < SHARKS.length - 1) {
-          setCurrentSharkIndex(currentSharkIndex + 1);
-          setIsRevealing(false);
-          setShowDecisionContent(false);
-        }
+        setCurrentSharkIndex(currentSharkIndex + 1);
+        setIsRevealing(false);
+        setShowDecisionContent(false);
       }, 3000);
       
       return () => clearTimeout(nextTimer);
