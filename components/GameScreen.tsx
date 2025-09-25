@@ -4,6 +4,7 @@ import { GameState, GamePhase } from '@/types/game';
 import PitchBuilder from './PitchBuilder';
 import PitchPresentation from './PitchPresentation';
 import SharkDecisions from './SharkDecisions';
+import PostSharkDecisions from './PostSharkDecisions';
 import Negotiation from './Negotiation';
 import Results from './Results';
 import History from './History';
@@ -47,8 +48,17 @@ export default function GameScreen({ gameState, onPhaseChange, onUpdateGameState
             pitch={gameState.currentPitch!}
             onComplete={(decisions) => {
               onUpdateGameState({ sharkDecisions: decisions });
-              onPhaseChange(GamePhase.NEGOTIATION);
+              onPhaseChange(GamePhase.POST_SHARK_DECISIONS);
             }}
+          />
+        );
+
+      case GamePhase.POST_SHARK_DECISIONS:
+        return (
+          <PostSharkDecisions 
+            gameState={gameState}
+            onPhaseChange={onPhaseChange}
+            onUpdateGameState={onUpdateGameState}
           />
         );
 

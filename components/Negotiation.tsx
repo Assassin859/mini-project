@@ -23,6 +23,8 @@ export default function Negotiation({ pitch, decisions, onComplete }: Negotiatio
 
   const activeOffers = decisions.filter(d => !d.isOut && d.offer);
 
+  // Note: activeOffers.length === 0 case is now handled by PostSharkDecisions component
+
   const handleSelectOffer = (decision: SharkDecision) => {
     setSelectedOffer(decision);
     setNegotiationPhase('countering');
@@ -157,26 +159,6 @@ export default function Negotiation({ pitch, decisions, onComplete }: Negotiatio
     };
     onComplete(deal);
   };
-
-  if (activeOffers.length === 0) {
-    return (
-      <div className="min-h-screen p-4 flex items-center justify-center">
-        <Card className="max-w-2xl w-full bg-slate-800/50 border-slate-600">
-          <CardContent className="p-8 text-center">
-            <X className="w-16 h-16 text-red-400 mx-auto mb-4" />
-            <h2 className="text-3xl font-bold text-white mb-4">No Offers Received</h2>
-            <p className="text-slate-300 mb-6">
-              Unfortunately, none of the sharks made an offer for your business. 
-              Don't give up - learn from this experience and try again!
-            </p>
-            <Button onClick={handleWalkAway} className="bg-blue-600 hover:bg-blue-700">
-              Return to Results
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen p-4">

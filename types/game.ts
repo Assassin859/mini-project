@@ -3,6 +3,7 @@ export enum GamePhase {
   PITCH_BUILDER = 'pitch_builder',
   PRESENTATION = 'presentation',
   SHARK_DECISIONS = 'shark_decisions',
+  POST_SHARK_DECISIONS = 'post_shark_decisions',
   NEGOTIATION = 'negotiation',
   RESULTS = 'results',
   HISTORY = 'history',
