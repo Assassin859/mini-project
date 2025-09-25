@@ -281,7 +281,7 @@ export default function MultiplayerLobby({ onBack, onJoinRoom }: MultiplayerLobb
                 <Input
                   id="playerName"
                   value={playerName}
-                  onChange={(e) => setPlayerName(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPlayerName(e.target.value)}
                   placeholder="Enter your name"
                   className="bg-slate-800 border-slate-600 text-white"
                   maxLength={20}
@@ -293,7 +293,7 @@ export default function MultiplayerLobby({ onBack, onJoinRoom }: MultiplayerLobb
                 <Input
                   id="roomName"
                   value={roomName}
-                  onChange={(e) => setRoomName(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRoomName(e.target.value)}
                   placeholder="Enter room name"
                   className="bg-slate-800 border-slate-600 text-white"
                   maxLength={30}
@@ -346,7 +346,7 @@ export default function MultiplayerLobby({ onBack, onJoinRoom }: MultiplayerLobb
                   <Input
                     id="joinPlayerName"
                     value={playerName}
-                    onChange={(e) => setPlayerName(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPlayerName(e.target.value)}
                     placeholder="Enter your name to join"
                     className="bg-slate-800 border-slate-600 text-white"
                     maxLength={20}
