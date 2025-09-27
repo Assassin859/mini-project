@@ -24,6 +24,7 @@ Deno.serve(async (req: Request) => {
 
     if (!supabaseUrl) {
       console.error('[game-action] Missing URL environment variable')
+      console.error('[game-action] Missing URL environment variable')
       return new Response(
         JSON.stringify({ error: 'CONFIGURATION_ERROR', message: 'Missing URL environment variable' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 },
@@ -31,6 +32,7 @@ Deno.serve(async (req: Request) => {
     }
     
     if (!supabaseServiceKey) {
+      console.error('[game-action] Missing SERVICE_ROLE_KEY environment variable')
       console.error('[game-action] Missing SERVICE_ROLE_KEY environment variable')
       return new Response(
         JSON.stringify({ error: 'CONFIGURATION_ERROR', message: 'Missing SERVICE_ROLE_KEY environment variable' }),

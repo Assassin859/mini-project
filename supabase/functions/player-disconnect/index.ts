@@ -42,6 +42,22 @@ Deno.serve(async (req: Request) => {
     console.log('[player-disconnect] Retrieved URL:', supabaseUrl ? 'Successfully retrieved' : 'Not found');
     console.log('[player-disconnect] Retrieved SERVICE_ROLE_KEY:', supabaseServiceKey ? 'Successfully retrieved' : 'Not found');
 
+    if (!supabaseUrl) {
+      console.error('[player-disconnect] Missing URL environment variable')
+      return new Response(
+        JSON.stringify({ error: 'CONFIGURATION_ERROR', message: 'Missing URL environment variable' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 },
+      )
+    }
+    
+    if (!supabaseServiceKey) {
+      console.error('[player-disconnect] Missing SERVICE_ROLE_KEY environment variable')
+      return new Response(
+        JSON.stringify({ error: 'CONFIGURATION_ERROR', message: 'Missing SERVICE_ROLE_KEY environment variable' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 },
+      )
+    }
+
     const supabaseClient = createClient(
       supabaseUrl ?? '',
       supabaseServiceKey ?? '',

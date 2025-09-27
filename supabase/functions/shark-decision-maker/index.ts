@@ -54,8 +54,8 @@ function calculateSharkDecision(shark: Shark, pitch: BusinessPitch): SharkDecisi
   const categoryBonus = shark.preferredCategories.includes(pitch.category) ? 30 : -10
   score += categoryBonus
   reasoning += categoryBonus > 0
-    ? `${shark.name} loves the ${pitch.category} space. `
-    : `${shark.name} is less familiar with ${pitch.category}. `
+    ? \`${shark.name} loves the ${pitch.category} space. `
+    : \`${shark.name} is less familiar with ${pitch.category}. `
 
   const revenueScore =
     pitch.currentRevenue >= shark.revenueRequirement
@@ -96,7 +96,7 @@ function calculateSharkDecision(shark: Shark, pitch: BusinessPitch): SharkDecisi
     sharkId: shark.id,
     isOut: false,
     offer: { amount: offerAmount, equity: Math.round(equityAsked), conditions: getRandomCondition() },
-    reasoning: reasoning + `I'll offer $${offerAmount.toLocaleString()} for ${Math.round(equityAsked)}% equity.`,
+    reasoning: reasoning + \`I'll offer $${offerAmount.toLocaleString()} for ${Math.round(equityAsked)}% equity.`,
   }
 }
 
@@ -112,6 +112,22 @@ Deno.serve(async (req: Request) => {
     // Add debug logging here
     console.log('[shark-decision-maker] Retrieved URL:', supabaseUrl ? 'Successfully retrieved' : 'Not found');
     console.log('[shark-decision-maker] Retrieved SERVICE_ROLE_KEY:', supabaseServiceKey ? 'Successfully retrieved' : 'Not found');
+
+    if (!supabaseUrl) {
+      console.error('[shark-decision-maker] Missing URL environment variable')
+      return new Response(
+        JSON.stringify({ error: 'CONFIGURATION_ERROR', message: 'Missing URL environment variable' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 },
+      )
+    }
+    
+    if (!supabaseServiceKey) {
+      console.error('[shark-decision-maker] Missing SERVICE_ROLE_KEY environment variable')
+      return new Response(
+        JSON.stringify({ error: 'CONFIGURATION_ERROR', message: 'Missing SERVICE_ROLE_KEY environment variable' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 },
+      )
+    }
 
     const supabaseClient = createClient(
       supabaseUrl ?? '',
