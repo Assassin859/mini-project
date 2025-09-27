@@ -84,7 +84,7 @@ Deno.serve(async (req: Request) => {
       case 'SUBMIT_PITCH':
         if (phase && phase !== 'pitch_builder') {
           return new Response(
-            JSON.stringify({ error: 'INVALID_PHASE', message: `Cannot SUBMIT_PITCH during ${phase}` }),
+            JSON.stringify({ error: 'INVALID_PHASE', message: \`Cannot SUBMIT_PITCH during ${phase}` }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 409 },
           )
         }
@@ -101,7 +101,7 @@ Deno.serve(async (req: Request) => {
       case 'MAKE_DECISION':
         if (phase && phase !== 'presentation') {
           return new Response(
-            JSON.stringify({ error: 'INVALID_PHASE', message: `Cannot MAKE_DECISION during ${phase}` }),
+            JSON.stringify({ error: 'INVALID_PHASE', message: \`Cannot MAKE_DECISION during ${phase}` }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 409 },
           )
         }
@@ -118,7 +118,7 @@ Deno.serve(async (req: Request) => {
       case 'NEGOTIATE':
         if (phase && phase !== 'negotiation') {
           return new Response(
-            JSON.stringify({ error: 'INVALID_PHASE', message: `Cannot NEGOTIATE during ${phase}` }),
+            JSON.stringify({ error: 'INVALID_PHASE', message: \`Cannot NEGOTIATE during ${phase}` }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 409 },
           )
         }
@@ -232,7 +232,7 @@ Deno.serve(async (req: Request) => {
         break
       default:
         return new Response(
-          JSON.stringify({ error: 'UNKNOWN_ACTION', message: `Unsupported action ${action.type}` }),
+          JSON.stringify({ error: 'UNKNOWN_ACTION', message: \`Unsupported action ${action.type}` }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 },
         )
     }
