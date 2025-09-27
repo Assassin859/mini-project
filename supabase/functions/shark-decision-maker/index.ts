@@ -1,3 +1,4 @@
+```typescript
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
 type BusinessPitch = {
@@ -105,9 +106,16 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    const supabaseUrl = Deno.env.get('URL')
+    const supabaseServiceKey = Deno.env.get('SERVICE_ROLE_KEY')
+
+    // Add debug logging here
+    console.log('[shark-decision-maker] Retrieved URL:', supabaseUrl ? 'Successfully retrieved' : 'Not found');
+    console.log('[shark-decision-maker] Retrieved SERVICE_ROLE_KEY:', supabaseServiceKey ? 'Successfully retrieved' : 'Not found');
+
     const supabaseClient = createClient(
-      Deno.env.get('URL') ?? '',
-      Deno.env.get('SERVICE_ROLE_KEY') ?? '',
+      supabaseUrl ?? '',
+      supabaseServiceKey ?? '',
     )
     // not used now, but ready for future auth/lookup
     void supabaseClient
@@ -137,3 +145,4 @@ Deno.serve(async (req: Request) => {
     )
   }
 })
+```

@@ -1,3 +1,4 @@
+```typescript
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
 const corsHeaders = {
@@ -17,6 +18,10 @@ Deno.serve(async (req: Request) => {
     const supabaseUrl = Deno.env.get('URL')
     const supabaseServiceKey = Deno.env.get('SERVICE_ROLE_KEY')
     
+    // Add debug logging here
+    console.log('[game-action] Retrieved URL:', supabaseUrl ? 'Successfully retrieved' : 'Not found');
+    console.log('[game-action] Retrieved SERVICE_ROLE_KEY:', supabaseServiceKey ? 'Successfully retrieved' : 'Not found');
+
     if (!supabaseUrl) {
       console.error('[game-action] Missing URL environment variable')
       return new Response(
@@ -257,3 +262,4 @@ Deno.serve(async (req: Request) => {
     })
   }
 })
+```

@@ -1,3 +1,4 @@
+```typescript
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
 const corsHeaders = {
@@ -34,9 +35,16 @@ Deno.serve(async (req: Request) => {
     return new Response('ok', { headers: corsHeaders })
   }
   try {
+    const supabaseUrl = Deno.env.get('URL')
+    const supabaseServiceKey = Deno.env.get('SERVICE_ROLE_KEY')
+
+    // Add debug logging here
+    console.log('[player-disconnect] Retrieved URL:', supabaseUrl ? 'Successfully retrieved' : 'Not found');
+    console.log('[player-disconnect] Retrieved SERVICE_ROLE_KEY:', supabaseServiceKey ? 'Successfully retrieved' : 'Not found');
+
     const supabaseClient = createClient(
-      Deno.env.get('URL') ?? '',
-      Deno.env.get('SERVICE_ROLE_KEY') ?? '',
+      supabaseUrl ?? '',
+      supabaseServiceKey ?? '',
     )
     const { roomId, playerId } = await req.json()
     if (!roomId || !playerId) {
@@ -89,3 +97,4 @@ Deno.serve(async (req: Request) => {
     )
   }
 })
+```
